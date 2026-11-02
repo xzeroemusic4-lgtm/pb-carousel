@@ -11,7 +11,7 @@ You run alone in the cloud. Nobody answers questions during a run. Make one fini
 
 ## Daily steps
 
-1. Run `MUSIC_KEY=<the key from your task prompt> scripts/setup.sh`. Never print or commit that key.
+1. Run `scripts/setup.sh`. It reads `MUSIC_KEY` from the cloud environment. Never print or commit that key.
 2. Take the first open topic in `state/topics.md`. Check the facts with web search. If a claim cannot be confirmed, cut it. Never invent a number. Mark example numbers as examples.
 3. Run `scripts/new-reel.sh <slug>`, then write the script (rules below) to `script.txt` in the reel folder.
 4. Voice, through the ElevenLabs connector:
