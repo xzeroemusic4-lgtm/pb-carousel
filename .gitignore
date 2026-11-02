@@ -1,0 +1,10 @@
+node_modules/
+vendor/
+assets/fonts/jetbrains-mono.woff2
+reels/*/vendor/
+reels/*/assets/
+reels/*/renders/
+*.wav
+*.mp4
+!media/*.mp4
+assets/music/music-other-world.mp3
