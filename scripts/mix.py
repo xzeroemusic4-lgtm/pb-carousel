@@ -31,8 +31,8 @@ for line in json.load(open(f"{A}/voiceover.lines.json")):
 smooth = int(0.22 * SR)
 env = np.convolve(target, np.ones(smooth) / smooth, "same")
 env[:smooth], env[-smooth:] = target[smooth], PAUSE_DB
-# The track plays from its start and only fades at the end of the film; the licence bars remixing or looping.
-bed = load(f"{A}/music-other-world.mp3")[:n] * (10 ** (env / 20))[:, None]
+# The bed is an original track, 80 s long, so there is no licence limit on looping or remixing.
+bed = load(f"{A}/music-bed.mp3")[:n] * (10 ** (env / 20))[:, None]
 fade = int(1.2 * SR)
 bed[-fade:] *= np.linspace(1, 0, fade)[:, None]
 bed[:240] *= np.linspace(0, 1, 240)[:, None]

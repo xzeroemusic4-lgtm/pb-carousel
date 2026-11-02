@@ -1,11 +1,5 @@
-RAC reel: "Ek berth, do ajnabi"
+Music: original ambient bed made by scripts/make_music.py (synthesised pads, bass and a soft pluck, fixed random seed).
+No third-party music is used, so there is no licence limit. The file music-bed.mp3 is generated from that script.
 
-Voice
-- ElevenLabs, voice "Kanika - Soft and Vibrant", Multilingual v2, speed 1.1, on a paid plan.
-
-Music
-- "Other World" by Lily J, from Mixkit (https://mixkit.co/free-stock-music/).
-  Mixkit Stock Music Free License, checked 1 Nov 2026 at https://mixkit.co/license/#musicFree
-  Allows social media video posts, commercial use and online ads.
-  Does not allow remixing, a music-only track, or registering it on a rights management service.
-  If a claim appears, Mixkit asks you to forward it to team@mixkit.co.
+Voice: ElevenLabs, voice "Kanika - Soft and Vibrant", Multilingual v2, speed 1.1, on a paid plan.
+Icons: simple-icons (CC0 1.0), https://simpleicons.org. Brand names and logos belong to their owners.

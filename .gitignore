@@ -7,4 +7,3 @@ reels/*/renders/
 *.wav
 *.mp4
 !media/*.mp4
-assets/music/music-other-world.mp3

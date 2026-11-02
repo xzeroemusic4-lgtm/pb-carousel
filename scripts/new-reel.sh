@@ -5,7 +5,7 @@ cd "$(dirname "$0")/.."
 DIR="reels/$(TZ=Asia/Kolkata date +%F)-$1"
 mkdir -p "$DIR/assets/audio" "$DIR/renders"
 cp -R assets/fonts "$DIR/assets/"
-cp assets/music/music-other-world.mp3 "$DIR/assets/audio/"
+cp assets/music/music-bed.mp3 "$DIR/assets/audio/"
 cp -R vendor "$DIR/"
 cat > "$DIR/hyperframes.json" <<J
 { "paths": { "assets": "assets" }, "media": { "autoProxy": false } }
