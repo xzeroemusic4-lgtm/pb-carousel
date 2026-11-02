@@ -34,7 +34,18 @@ You run alone in the cloud. Nobody answers questions during a run. Make one fini
 ## Script rules
 
 - For Indians. Casual Hinglish. Everyday Indian situations and references. Never copy another creator's words.
+- Connect every reel to AI: show where AI or machine learning does the real work in the system, not just a curious fact. Only claim what you can confirm. If a topic has no real AI link, say what AI is changing or could change there, and mark that as a possibility.
 - At most 60 seconds: about 19 short lines. Open with the most surprising truth, in question or challenge form, inside the first 3 seconds.
+- Hooks: the opening should make viewers feel they are missing something other people have missed. Use one pattern from the list below or a new one in the same spirit, always tied to the day's topic in the same breath. Never use a pattern on its own, and do not repeat the pattern of the last 3 reels (check the `script.txt` files in `reels/`). Use a pattern only if it is true for the topic.
+  - बहुत ही कम लोगों को इसके बारे में पता है।
+  - ज़्यादातर लोग इसके बारे में गलत सोचते हैं।
+  - क्या आपको पता है?
+  - कई सारे लोगों को यही नहीं पता।
+  - आपने ये हज़ारों बार देखा है, पर कभी ध्यान नहीं दिया।
+  - जो आपको बताया गया है, वो सिर्फ आधा सच है।
+  - इसके पीछे एक पूरा सिस्टम चलता है, जो किसी को दिखता नहीं।
+  - अगली बार जब ये करें, तो ये बात याद रखना।
+  - रोज़ करते हैं, पर कभी सोचा है ये होता कैसे है?
 - Write Hindi words in Devanagari and English words in Latin letters. Spell abbreviations in Devanagari, like आर ए सी.
 - Each line on its own line. Pauses happen only at a full stop or a new line. No ellipses. No commas that break a sentence.
 - End with a question that invites comments, then a follow line.

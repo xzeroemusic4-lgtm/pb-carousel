@@ -1,9 +1,14 @@
 # Topics
 
-The series is "Desi Systems": how an everyday Indian system really works. Take the first open topic. Add new ones when fewer than 5 are left, always from everyday Indian life.
+The series is "Desi Systems": how the systems Indians use every day really work, with AI at the centre wherever it is true. Take the first open topic. Add new ones when fewer than 5 are left, leaning towards AI and always from everyday Indian life.
 
 ## Open
 
+- YouTube: how the suggestion system picks your next video
+- LLMs: how they actually work
+- Claude: how it writes an answer
+- Netflix: how it decides what to show you
+- MacBook battery: why it lasts so much longer than a Windows laptop, and what the on-device AI chip does
 - Tatkal: why it sells out in seconds
 - UPI: where the money goes in those 3 seconds
 - FASTag: how a toll gate knows it is you
