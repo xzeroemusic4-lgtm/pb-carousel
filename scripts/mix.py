@@ -5,7 +5,7 @@ import numpy as np, soundfile as sf
 D, DUR = sys.argv[1], float(sys.argv[2])
 A = f"{D}/assets/audio"
 SR = 48000
-MUSIC_BELOW_VOICE_DB = 10  # under speech the bed sits this far below the voice's loudness (Prince asked for -10 dB)
+MUSIC_BELOW_VOICE_DB = 25  # under speech the bed sits this far below the voice loudness (Prince asked for -25 dB)
 GAP_LIFT_DB = 4            # the bed rises this much in the gaps between lines
 
 
