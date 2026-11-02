@@ -4,7 +4,6 @@ The series is "Desi Systems": how the systems Indians use every day really work,
 
 ## Open
 
-- ChatGPT: what it is and how it answers, step by step
 - YouTube: how the suggestion system picks your next video
 - LLMs: how they actually work
 - Claude: how it writes an answer
@@ -39,3 +38,4 @@ The series is "Desi Systems": how the systems Indians use every day really work,
 ## Done
 
 - RAC: why two strangers share one berth (2 Nov 2026)
+- ChatGPT: what it is and how it answers, step by step (2 Nov 2026)

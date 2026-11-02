@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="vendor/gsap.min.js"></script>
+    <style>
+      @font-face {
+        font-family: "Space Grotesk";
+        src: url("assets/fonts/space-grotesk.woff2") format("woff2");
+        font-weight: 300 700;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: "JetBrains Mono";
+        src: url("assets/fonts/jetbrains-mono.woff2") format("woff2");
+        font-weight: 100 800;
+        font-style: normal;
+      }
+      :root {
+        --bg: #ffffff;
+        --ink: #0b0b0b;
+        --soft: #6b6b6b;
+        --line: #e3e3e3;
+        --card: #f5f5f4;
+        --acc: #10a37f;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--bg); }
+      #root {
+        position: relative; width: 1080px; height: 1920px; overflow: hidden;
+        background: var(--bg); color: var(--ink); font-family: "Space Grotesk", sans-serif;
+      }
+      .mono { font-family: "JetBrains Mono", monospace; }
+      #hdr {
+        position: absolute; left: 80px; right: 80px; top: 210px; height: 50px;
+        display: flex; justify-content: space-between; align-items: center;
+        font-family: "JetBrains Mono", monospace; font-size: 28px; letter-spacing: 3px; font-weight: 600;
+        border-bottom: 3px solid var(--ink); padding-bottom: 14px;
+      }
+      #hdr b { color: var(--acc); }
+      #steps { display: flex; gap: 10px; }
+      #steps i { display: block; width: 34px; height: 8px; background: var(--line); border-radius: 4px; }
+      .scene { position: absolute; left: 80px; right: 80px; top: 320px; height: 1180px; opacity: 0; visibility: hidden; }
+      .kick { font-family: "JetBrains Mono", monospace; font-size: 30px; letter-spacing: 4px; font-weight: 700; color: var(--acc); text-transform: uppercase; }
+      .ttl { font-size: 92px; line-height: 1.04; font-weight: 700; letter-spacing: -2px; margin-top: 18px; }
+      .ttl span { display: inline-block; }
+      .ttl .a { color: var(--acc); }
+      .sub { font-size: 40px; color: var(--soft); margin-top: 22px; font-weight: 500; }
+      .card { background: var(--card); border: 3px solid var(--ink); border-radius: 28px; padding: 36px 40px; }
+      .bub { display: inline-block; font-size: 44px; font-weight: 600; padding: 26px 34px; border-radius: 30px; }
+      .bub.u { background: var(--ink); color: #fff; border-bottom-right-radius: 8px; }
+      .bub.b { background: #fff; border: 3px solid var(--ink); border-bottom-left-radius: 8px; }
+      .tag { font-family: "JetBrains Mono", monospace; font-size: 30px; letter-spacing: 2px; font-weight: 700; color: var(--soft); }
+      .chip { display: inline-block; font-family: "JetBrains Mono", monospace; font-size: 40px; font-weight: 700; padding: 18px 22px; border: 3px solid var(--ink); border-radius: 16px; background: #fff; }
+      .chip.a { background: var(--acc); border-color: var(--acc); color: #fff; }
+      .btn { display: inline-block; font-size: 46px; font-weight: 700; padding: 26px 44px; border-radius: 60px; }
+      .btn.k { background: var(--ink); color: #fff; }
+      .btn.a { background: var(--acc); color: #fff; }
+
+      /* s1 */
+      #s1 .myth { position: absolute; left: 0; right: 0; top: 560px; }
+      #s1 .myth .card { position: relative; font-size: 54px; font-weight: 700; text-align: center; }
+      #s1 .strike { position: absolute; left: 30px; right: 30px; top: 50%; height: 8px; background: var(--ink); transform-origin: left center; transform: scaleX(0); }
+      #s1 .stamp { position: absolute; right: 40px; top: -46px; transform: rotate(-8deg); font-family: "JetBrains Mono", monospace; font-size: 52px; font-weight: 800; color: #fff; background: var(--acc); padding: 10px 26px; border-radius: 12px; }
+      /* s2 */
+      #s2 .chat { position: absolute; left: 0; right: 0; top: 420px; display: flex; flex-direction: column; gap: 40px; }
+      #s2 .row { display: flex; }
+      #s2 .row.r { justify-content: flex-end; }
+      #s2 .bub.b { min-height: 120px; max-width: 860px; line-height: 1.25; }
+      #s2 .w { display: inline-block; opacity: 0; margin-right: 12px; }
+      #s2 .cur { display: inline-block; width: 18px; height: 46px; background: var(--acc); vertical-align: -6px; }
+      /* s3 */
+      #s3 .flow { position: absolute; left: 0; right: 0; top: 400px; height: 620px; }
+      #s3 .phone { position: absolute; left: 30px; top: 60px; width: 230px; height: 440px; border: 6px solid var(--ink); border-radius: 40px; background: #fff; padding: 50px 22px; }
+      #s3 .phone i { display: block; height: 28px; border-radius: 14px; background: var(--line); margin-bottom: 18px; }
+      #s3 .phone i.k { background: var(--ink); width: 70%; margin-left: auto; }
+      #s3 .rack { position: absolute; right: 20px; top: 20px; width: 300px; padding: 24px; border: 6px solid var(--ink); border-radius: 22px; background: #fff; }
+      #s3 .rack div { height: 74px; border: 4px solid var(--ink); border-radius: 10px; margin-bottom: 16px; position: relative; }
+      #s3 .rack div:last-child { margin-bottom: 0; }
+      #s3 .rack div::after { content: ""; position: absolute; right: 18px; top: 24px; width: 18px; height: 18px; border-radius: 9px; background: var(--acc); }
+      #s3 .wire { position: absolute; left: 290px; right: 350px; top: 278px; border-top: 6px dashed var(--ink); }
+      #s3 .pkt { position: absolute; left: 290px; top: 250px; width: 60px; height: 60px; border-radius: 30px; background: var(--acc); }
+      #s3 .lab1 { position: absolute; left: 30px; top: 530px; width: 230px; text-align: center; }
+      #s3 .lab2 { position: absolute; right: 20px; top: 530px; width: 300px; text-align: center; }
+      /* s4 */
+      #s4 .sent { position: absolute; left: 0; right: 0; top: 400px; text-align: center; font-size: 60px; font-weight: 700; }
+      #s4 .toks { position: absolute; left: 0; right: 0; top: 380px; display: flex; flex-wrap: wrap; justify-content: center; gap: 22px 18px; }
+      #s4 .tk { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+      #s4 .id { font-family: "JetBrains Mono", monospace; font-size: 34px; font-weight: 700; color: var(--acc); opacity: 0; }
+      #s4 .model { position: absolute; left: 230px; right: 230px; top: 860px; height: 170px; display: flex; align-items: center; justify-content: center; background: var(--ink); color: #fff; border-radius: 28px; font-family: "JetBrains Mono", monospace; font-size: 54px; font-weight: 800; letter-spacing: 6px; }
+      #s4 .arr { position: absolute; left: 50%; top: 700px; width: 6px; height: 130px; margin-left: -3px; background: var(--ink); transform-origin: top center; }
+      #s4 .arr::after { content: ""; position: absolute; left: -17px; bottom: -20px; border-left: 20px solid transparent; border-right: 20px solid transparent; border-top: 26px solid var(--ink); }
+      #s4 .ex { position: absolute; left: 0; right: 0; top: 640px; text-align: center; opacity: 0; }
+      /* s5 */
+      #s5 .grid { position: absolute; left: 60px; right: 60px; top: 380px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; }
+      #s5 .gpu { height: 140px; border: 5px solid var(--ink); border-radius: 18px; display: flex; align-items: center; justify-content: center; font-family: "JetBrains Mono", monospace; font-size: 30px; font-weight: 800; background: #fff; }
+      #s5 .docs { position: absolute; left: 0; right: 0; top: 760px; height: 380px; }
+      #s5 .doc { position: absolute; top: 0; width: 230px; height: 300px; border: 5px solid var(--ink); border-radius: 18px; background: #fff; padding: 34px 26px; }
+      #s5 .doc i { display: block; height: 16px; background: var(--line); border-radius: 8px; margin-bottom: 20px; }
+      #s5 .doc i:nth-child(2n) { width: 70%; }
+      #s5 .dl { position: absolute; left: 0; right: 0; top: 320px; text-align: center; }
+      /* s6 */
+      #s6 .q { position: absolute; left: 0; right: 0; top: 330px; font-size: 64px; font-weight: 700; }
+      #s6 .blank { display: inline-block; min-width: 230px; border-bottom: 8px solid var(--acc); color: var(--acc); }
+      #s6 .bars { position: absolute; left: 0; right: 0; top: 500px; display: flex; flex-direction: column; gap: 26px; }
+      #s6 .bar { display: flex; align-items: center; gap: 24px; font-size: 44px; font-weight: 700; }
+      #s6 .bar .n { width: 200px; }
+      #s6 .bar .t { flex: 1; height: 64px; border: 4px solid var(--ink); border-radius: 14px; overflow: hidden; }
+      #s6 .bar .f { height: 100%; background: var(--ink); transform-origin: left center; transform: scaleX(0); }
+      #s6 .bar.top .f { background: var(--acc); }
+      #s6 .bar .p { width: 120px; text-align: right; font-family: "JetBrains Mono", monospace; font-size: 38px; }
+      #s6 .exl { position: absolute; left: 0; right: 0; top: 820px; }
+      #s6 .loop { position: absolute; left: 0; right: 0; top: 900px; display: flex; align-items: center; gap: 36px; }
+      #s6 .ring { width: 170px; height: 170px; border-radius: 85px; border: 10px solid var(--line); border-top-color: var(--acc); border-right-color: var(--acc); flex: none; }
+      #s6 .lt { font-size: 52px; font-weight: 700; }
+      /* s7 */
+      #s7 .ans { position: absolute; left: 0; right: 0; top: 420px; display: flex; flex-direction: column; gap: 40px; }
+      #s7 .card { display: flex; align-items: center; gap: 30px; font-size: 44px; font-weight: 600; }
+      #s7 .rk { flex: none; width: 110px; height: 110px; border-radius: 55px; display: flex; align-items: center; justify-content: center; font-family: "JetBrains Mono", monospace; font-size: 46px; font-weight: 800; border: 5px solid var(--ink); background: #fff; }
+      #s7 .rk.a { background: var(--acc); border-color: var(--acc); color: #fff; }
+      #s7 .human { position: absolute; left: 50%; top: 860px; margin-left: -90px; width: 180px; height: 230px; }
+      #s7 .human .hd { position: absolute; left: 50px; top: 0; width: 80px; height: 80px; border-radius: 40px; background: var(--ink); }
+      #s7 .human .bd { position: absolute; left: 10px; top: 96px; width: 160px; height: 130px; border-radius: 80px 80px 18px 18px; background: var(--ink); }
+      /* s8 */
+      #s8 .warn { position: absolute; left: 50%; top: 360px; margin-left: -130px; width: 0; height: 0; border-left: 130px solid transparent; border-right: 130px solid transparent; border-bottom: 226px solid var(--ink); }
+      #s8 .warn::after { content: "!"; position: absolute; left: -24px; top: 56px; width: 48px; text-align: center; color: #fff; font-size: 150px; font-weight: 700; line-height: 1; }
+      #s8 .cmp { position: absolute; left: 0; right: 0; top: 680px; display: flex; flex-direction: column; gap: 30px; }
+      #s8 .cmp .card { font-size: 50px; font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
+      #s8 .cmp .card.a { background: var(--acc); border-color: var(--acc); color: #fff; }
+      #s8 .cmp .neq { text-align: center; font-size: 80px; font-weight: 700; color: var(--acc); line-height: 1; }
+      /* s9 */
+      #s9 .ctas { position: absolute; left: 0; right: 0; top: 760px; display: flex; flex-direction: column; align-items: flex-start; gap: 40px; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="48.88" data-width="1080" data-height="1920">
+      <audio id="mix" src="assets/audio/mix.wav" data-start="0" data-duration="48.88" data-track-index="9" data-volume="1"></audio>
+      <div id="hdr"><span>DESI SYSTEMS · <b>CHATGPT</b></span><span id="steps"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
+
+      <div class="scene" id="s1">
+        <div class="kick">Myth vs sach</div>
+        <div class="ttl"><span>Zyaadatar</span> <span>log</span> <span class="a">ChatGPT</span> <span>ko</span> <span>galat</span> <span>samajhte</span> <span>hain</span></div>
+        <div class="myth">
+          <div class="card">Jawab pehle se likha hai?<div class="strike"></div><div class="stamp">NAHI</div></div>
+        </div>
+      </div>
+
+      <div class="scene" id="s2">
+        <div class="kick">Asli tarika</div>
+        <div class="ttl"><span>Ek</span> <span>ek</span> <span class="a">word</span> <span>karke</span></div>
+        <div class="chat">
+          <div class="row r"><div class="bub u">Chai ke saath kya best hai?</div></div>
+          <div class="row"><div class="bub b"><span class="w">Garam</span><span class="w">samosa</span><span class="w">aur</span><span class="w">thodi</span><span class="w">chutney.</span><span class="cur"></span></div></div>
+        </div>
+      </div>
+
+      <div class="scene" id="s3">
+        <div class="kick">Step 1 · Request</div>
+        <div class="ttl"><span>Message</span> <span>jaata</span> <span>hai</span> <span class="a">servers</span> <span>par</span></div>
+        <div class="flow">
+          <div class="phone"><i class="k"></i><i></i><i class="k"></i><i></i></div>
+          <div class="wire"></div>
+          <div class="pkt"></div>
+          <div class="rack"><div></div><div></div><div></div><div></div><div></div></div>
+          <div class="tag lab1">AAPKA PHONE</div>
+          <div class="tag lab2">OPENAI SERVERS</div>
+        </div>
+      </div>
+
+      <div class="scene" id="s4">
+        <div class="kick">Step 2 · Tokens</div>
+        <div class="ttl"><span>Sentence</span> <span>kat'ta</span> <span>hai</span> <span class="a">tokens</span> <span>mein</span></div>
+        <div class="sent" data-layout-allow-overlap>Chai ke saath kya best hai?</div>
+        <div class="toks">
+          <div class="tk"><span class="chip">Chai</span><span class="id">4021</span></div>
+          <div class="tk"><span class="chip">ke</span><span class="id">387</span></div>
+          <div class="tk"><span class="chip">saath</span><span class="id">9152</span></div>
+          <div class="tk"><span class="chip">kya</span><span class="id">2210</span></div>
+          <div class="tk"><span class="chip">best</span><span class="id">1888</span></div>
+          <div class="tk"><span class="chip">hai?</span><span class="id">731</span></div>
+        </div>
+        <div class="tag ex">EXAMPLE NUMBERS · HAR TOKEN = EK NUMBER</div>
+        <div class="arr"></div>
+        <div class="model">MODEL</div>
+      </div>
+
+      <div class="scene" id="s5">
+        <div class="kick">Step 3 · Hardware + training</div>
+        <div class="ttl"><span class="a">GPU</span> <span>servers</span> <span>par</span> <span>chalta</span> <span>hai</span></div>
+        <div class="grid">
+          <div class="gpu">GPU</div><div class="gpu">GPU</div><div class="gpu">GPU</div><div class="gpu">GPU</div>
+          <div class="gpu">GPU</div><div class="gpu">GPU</div><div class="gpu">GPU</div><div class="gpu">GPU</div>
+        </div>
+        <div class="docs">
+          <div class="doc" style="left: 70px"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="doc" style="left: 345px"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="doc" style="left: 620px"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="tag dl">DHER SAARA TEXT · EK HI KHEL SEEKHA</div>
+        </div>
+      </div>
+
+      <div class="scene" id="s6">
+        <div class="kick">Step 4 · Agla word</div>
+        <div class="ttl"><span>Agla</span> <span>word</span> <span class="a">kaunsa?</span></div>
+        <div class="q">Chai ke saath <span class="blank"><span id="fill">samosa</span></span></div>
+        <div class="bars">
+          <div class="bar top"><span class="n">samosa</span><span class="t"><span class="f" style="display:block;width:100%"></span></span><span class="p">62%</span></div>
+          <div class="bar"><span class="n">biscuit</span><span class="t"><span class="f" style="display:block;width:100%"></span></span><span class="p">24%</span></div>
+          <div class="bar"><span class="n">pakode</span><span class="t"><span class="f" style="display:block;width:100%"></span></span><span class="p">14%</span></div>
+        </div>
+        <div class="tag exl">EXAMPLE PROBABILITIES</div>
+        <div class="loop"><div class="ring"></div><div class="lt">Chuno · jodo · <span style="color: var(--acc)">repeat</span><div class="sub" style="margin-top: 6px">jab tak jawab poora na ho</div></div></div>
+      </div>
+
+      <div class="scene" id="s7">
+        <div class="kick">Step 5 · Human feedback</div>
+        <div class="ttl"><span>Insaan</span> <span>jawab</span> <span class="a">rank</span> <span>karte</span> <span>the</span></div>
+        <div class="ans">
+          <div class="card"><span class="rk a">#1</span><span>Saaf, kaam ka jawab</span></div>
+          <div class="card"><span class="rk">#2</span><span>Ghuma phira ke jawab</span></div>
+        </div>
+        <div class="human"><div class="hd"></div><div class="bd"></div></div>
+      </div>
+
+      <div class="scene" id="s8">
+        <div class="kick">Yaad rakhna</div>
+        <div class="ttl"><span>Har</span> <span>baar</span> <span class="a">sach</span> <span>nahi</span></div>
+        <div class="warn"></div>
+        <div class="cmp">
+          <div class="card"><span>Sach</span><span class="tag">FACT</span></div>
+          <div class="neq">≠</div>
+          <div class="card a"><span>Sabse sahi lagne wala word</span></div>
+        </div>
+      </div>
+
+      <div class="scene" id="s9">
+        <div class="kick">Aapki baari</div>
+        <div class="ttl"><span>Aap</span> <span class="a">ChatGPT</span> <span>se</span> <span>sabse</span> <span>zyada</span> <span>kya</span> <span>poochte</span> <span>ho?</span></div>
+        <div class="ctas">
+          <div class="btn k" id="cm">Comment karo</div>
+          <div class="btn a" id="fl">+ Follow · Desi Systems</div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const DUR = 48.88;
+      const LEAD = 0.08;
+      const T = (t) => Math.max(0, t - LEAD);
+      const tl = gsap.timeline({ paused: true });
+      const q = (s) => document.querySelector(s);
+      const qa = (s) => Array.from(document.querySelectorAll(s));
+
+      // keeps the timeline exactly the film length
+      tl.set({}, {}, DUR);
+
+      const SCENES = [
+        ["#s1", 0, 5.2],
+        ["#s2", 5.38, 7.95],
+        ["#s3", 8.2, 11.3],
+        ["#s4", 11.5, 17.9],
+        ["#s5", 18.1, 23.98],
+        ["#s6", 24.15, 31.85],
+        ["#s7", 31.95, 35.15],
+        ["#s8", 35.4, 41.0],
+        ["#s9", 41.1, DUR + 1]
+      ];
+      const steps = qa("#steps i");
+      SCENES.forEach(([sel, a, b], i) => {
+        if (a === 0) tl.set(sel, { autoAlpha: 1 }, 0);
+        else tl.fromTo(sel, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.2, ease: "none", immediateRender: false }, a);
+        if (b < DUR) tl.to(sel, { autoAlpha: 0, duration: 0.18, ease: "none" }, b);
+        tl.set(steps[i], { backgroundColor: "#10a37f" }, Math.max(0, a));
+      });
+
+      function rv(target, t, from) {
+        tl.fromTo(target, Object.assign({ autoAlpha: 0, y: 26 }, from || {}), { autoAlpha: 1, y: 0, x: 0, scale: 1, duration: 0.28, ease: "power2.out", immediateRender: true }, T(t));
+      }
+      function words(sel, t0, t1) {
+        const w = qa(sel + " .ttl span");
+        w.forEach((el, i) => rv(el, t0 + ((t1 - t0) * i) / w.length));
+      }
+
+      // S1: hook (0-2.82, 3.42-5.13)
+      rv("#s1 .kick", 0.08);
+      words("#s1", 0.08, 2.4);
+      rv("#s1 .myth", 3.42, { y: 40 });
+      tl.to("#s1 .strike", { scaleX: 1, duration: 0.25, ease: "power2.out" }, T(4.3));
+      rv("#s1 .stamp", 4.55, { scale: 1.6, y: 0 });
+
+      // S2: word by word (5.64-7.83)
+      rv("#s2 .kick", 5.64);
+      words("#s2", 5.64, 6.9);
+      rv("#s2 .row.r", 5.9, { x: 60, y: 0 });
+      qa("#s2 .w").forEach((el, i) => tl.to(el, { opacity: 1, duration: 0.12, ease: "none" }, T(6.3 + i * 0.3)));
+      tl.fromTo("#s2 .cur", { opacity: 1 }, { opacity: 0.15, duration: 0.25, repeat: 7, yoyo: true, ease: "steps(1)", immediateRender: false }, 5.9);
+
+      // S3: request to servers (8.44-11.18)
+      rv("#s3 .kick", 8.44);
+      words("#s3", 8.44, 9.6);
+      rv("#s3 .phone", 8.6, { x: -60, y: 0 });
+      rv("#s3 .lab1", 8.7);
+      rv("#s3 .wire", 9.0, { y: 0 });
+      rv("#s3 .rack", 9.9, { x: 60, y: 0 });
+      rv("#s3 .lab2", 10.0);
+      tl.fromTo("#s3 .pkt", { x: 0, autoAlpha: 0 }, { x: 380, autoAlpha: 1, duration: 1.2, ease: "power1.inOut", immediateRender: true }, T(9.5));
+
+      // S4: tokens (11.75-14.42), numbers into model (14.82-17.73)
+      rv("#s4 .kick", 11.75);
+      words("#s4", 11.75, 13.0);
+      rv("#s4 .sent", 11.75);
+      tl.to("#s4 .sent", { autoAlpha: 0, duration: 0.2, ease: "none" }, T(14.0));
+      qa("#s4 .chip").forEach((el, i) => rv(el, 14.0 + i * 0.1, { scale: 0.6, y: 0 }));
+      qa("#s4 .id").forEach((el, i) => rv(el, 14.82 + i * 0.12, { y: -14 }));
+      rv("#s4 .ex", 15.2);
+      tl.fromTo("#s4 .arr", { scaleY: 0 }, { scaleY: 1, duration: 0.28, ease: "power2.out", immediateRender: true }, T(15.9));
+      rv("#s4 .model", 16.4, { scale: 0.85, y: 0 });
+
+      // S5: GPUs (18.32-20.63), training text (21.04-23.88)
+      rv("#s5 .kick", 18.32);
+      words("#s5", 18.32, 19.6);
+      qa("#s5 .gpu").forEach((el, i) => {
+        rv(el, 18.6 + i * 0.08, { scale: 0.7, y: 0 });
+        tl.to(el, { backgroundColor: "#10a37f", color: "#ffffff", borderColor: "#10a37f", duration: 0.2, ease: "none" }, T(19.6 + i * 0.1));
+      });
+      qa("#s5 .doc").forEach((el, i) => rv(el, 21.04 + i * 0.18, { y: 60 }));
+      rv("#s5 .dl", 21.9);
+
+      // S6: next word (24.37-25.65), pick and add (26.1-28.78), loop (29.33-31.71)
+      rv("#s6 .kick", 24.37);
+      words("#s6", 24.37, 25.2);
+      rv("#s6 .q", 24.7);
+      const P = [0.62, 0.24, 0.14];
+      qa("#s6 .bar").forEach((el, i) => {
+        rv(el, 26.1 + i * 0.15, { x: -40, y: 0 });
+        tl.fromTo(el.querySelector(".f"), { scaleX: 0 }, { scaleX: P[i], duration: 0.3, ease: "power2.out", immediateRender: true }, T(26.3 + i * 0.15));
+      });
+      rv("#s6 .exl", 26.6);
+      rv("#fill", 27.9, { y: -30 });
+      rv("#s6 .loop", 29.33, { y: 40 });
+      tl.fromTo("#s6 .ring", { rotation: 0 }, { rotation: 720, duration: 2.4, ease: "none", immediateRender: true }, T(29.33));
+
+      // S7: human ranking (32.15-35.01)
+      rv("#s7 .kick", 32.15);
+      words("#s7", 32.15, 33.4);
+      qa("#s7 .ans .card").forEach((el, i) => rv(el, 32.6 + i * 0.25, { x: 60, y: 0 }));
+      rv("#s7 .human", 33.4, { y: 50 });
+      qa("#s7 .rk").forEach((el, i) => rv(el, 34.0 + i * 0.3, { scale: 0.4, y: 0 }));
+
+      // S8: caution (35.62-37.59, 38.17-40.87)
+      rv("#s8 .kick", 35.62);
+      words("#s8", 35.62, 36.8);
+      rv("#s8 .warn", 36.2, { scale: 0.6, y: 0 });
+      rv("#s8 .cmp .card:not(.a)", 38.17, { x: -60, y: 0 });
+      rv("#s8 .neq", 38.6, { scale: 0.5, y: 0 });
+      rv("#s8 .cmp .card.a", 39.0, { x: 60, y: 0 });
+
+      // S9: question (41.3-45.32), follow (45.77-47.46)
+      rv("#s9 .kick", 41.3);
+      words("#s9", 41.3, 43.8);
+      rv("#cm", 44.72, { scale: 0.8, y: 0 });
+      rv("#fl", 45.77, { scale: 0.8, y: 0 });
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>
