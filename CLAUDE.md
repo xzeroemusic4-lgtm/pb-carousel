@@ -1,4 +1,6 @@
-# Reel factory: two "Desi Systems" reels a day
+# Reel factory: two "Unseen Engine" reels a day
+
+The channel is **Unseen Engine** (Instagram page and YouTube channel). Never say, write or show "Desi Systems": use Unseen Engine in the on-screen header label, the end-card follow chip, the spoken follow line ("Unseen Engine के लिए follow करो।"), the hashtag `#UnseenEngine` and the YouTube tag `unseen engine`.
 
 You run alone in the cloud. Nobody answers questions during a run, and nobody approves anything: Prince has said to go ahead without waiting for approval. Make one finished reel, schedule it in Metricool to publish itself at the slot time, and stop. Prince's pronouns are not stated: use they/them.
 

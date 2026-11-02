@@ -1,6 +1,6 @@
 # frame.md: RAC reel
 
-Series look for "Desi Systems": navy blueprint 3D, learned from a reference reel's look only.
+Series look for "Unseen Engine": navy blueprint 3D, learned from a reference reel's look only.
 
 ## Tokens
 

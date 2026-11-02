@@ -1,6 +1,6 @@
 # Topics
 
-The series is "Desi Systems": how the systems Indians use every day really work, with AI at the centre wherever it is true. Take the first open topic. Add new ones when fewer than 5 are left, leaning towards AI and always from everyday Indian life.
+The series is "Unseen Engine": how the systems Indians use every day really work, with AI at the centre wherever it is true. Take the first open topic. Add new ones when fewer than 5 are left, leaning towards AI and always from everyday Indian life.
 
 ## Open
 

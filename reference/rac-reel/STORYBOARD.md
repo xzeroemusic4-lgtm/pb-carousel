@@ -130,4 +130,4 @@ audience: Indians on Instagram, Hinglish
 - act: Act 6: Your turn
 - duration: 9.62s
 - scene: Back to the opening berth, both halves glowing. POORA and AADHA chips, then comment and follow.
-- voiceover: "Railways tum chalate, toh RAC ka kiraya kitna rakhte? Poora ya aadha? Comment karo, aur follow karo aise hi desi systems ka khel samajhne ke liye."
+- voiceover: "Railways tum chalate, toh RAC ka kiraya kitna rakhte? Poora ya aadha? Comment karo, aur follow karo aise hi unseen engine ka khel samajhne ke liye."
