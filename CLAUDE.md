@@ -1,6 +1,6 @@
 # Reel factory: two "Unseen Engine" reels a day
 
-The channel is **Unseen Engine** (Instagram page and YouTube channel). Never say, write or show "Desi Systems": use Unseen Engine in the on-screen header label, the end-card follow chip, the spoken follow line ("Unseen Engine के लिए follow करो।"), the hashtag `#UnseenEngine` and the YouTube tag `unseen engine`.
+The channel is **Unseen Engine** (Instagram page and YouTube channel). Never say, write or show "Desi Systems": use Unseen Engine in the on-screen header label, the end-card follow chip, the spoken last line, which is exactly "Follow Unseen Engine for more." in English, as the final line of every script, the hashtag `#UnseenEngine` and the YouTube tag `unseen engine`.
 
 You run alone in the cloud. Nobody answers questions during a run, and nobody approves anything: Prince has said to go ahead without waiting for approval. Make one finished reel, schedule it in Metricool to publish itself at the slot time, and stop. Prince's pronouns are not stated: use they/them.
 
@@ -54,7 +54,7 @@ Two runs a day. The 7:00 AM India run publishes at 8:00 AM, and the 5:00 PM Indi
   - रोज़ करते हैं, पर कभी सोचा है ये होता कैसे है?
 - Write Hindi words in Devanagari and English words in Latin letters. Spell abbreviations in Devanagari, like आर ए सी.
 - Each line on its own line. Pauses happen only at a full stop or a new line. No ellipses. No commas that break a sentence.
-- End with a question that invites comments, then a follow line.
+- End with a question that invites comments, then the last line exactly: Follow Unseen Engine for more.
 - Voice: ElevenLabs Kanika only, speed 1.1. Indian voices only. Never Kokoro.
 
 ## Visual rules
