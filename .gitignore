@@ -7,3 +7,4 @@ reels/*/renders/
 *.wav
 *.mp4
 !media/*.mp4
+reels/*/.hyperframes/
