@@ -8,4 +8,4 @@ cp node_modules/gsap/dist/gsap.min.js vendor/
 cp node_modules/three/build/three.module.js node_modules/three/build/three.core.js vendor/three/build/
 cp -R node_modules/three/examples/jsm vendor/three/examples/
 cp node_modules/@fontsource-variable/jetbrains-mono/files/jetbrains-mono-latin-wght-normal.woff2 assets/fonts/jetbrains-mono.woff2
-pip install --quiet numpy soundfile
+python3 -m pip install --quiet numpy soundfile

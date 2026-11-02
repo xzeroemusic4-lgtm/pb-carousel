@@ -21,7 +21,7 @@ Two runs a day. The 7:00 AM India run publishes at 8:00 AM, and the 5:00 PM Indi
    - `creative_update_node` with flow `N9dFLXA6kikM3L7bz29X`, node `3ibOvBNcozQq8DIzlmu3`, the script as `prompt`, and `model_parameters` exactly `{"voice_id":"xccfcojYYGnqTTxwZEDU","voice_settings":{"speed":1.1}}` (Kanika; the call is rejected without `voice_id`, and `output_format` and `voice` are not valid parameters).
    - `creative_run_flow_nodes` with that node and `generations_count` 1.
    - `creative_get_flow_run_status` until it has a `content_url`, then download it with curl.
-   - Run `python3 scripts/place_voice.py <reel dir> <file>`. If the duration is over 58 seconds, cut lines and make the voice again, once only. A second miss stops the run.
+   - Run `python3 scripts/place_voice.py <reel dir> <file>`. If the duration is over 58 seconds, cut lines and make the voice again, once only. A second miss stops the run. `place_voice.py` returns speech segments, and there can be more segments than script lines. If the counts differ, do not guess which segment belongs to which line: call the ElevenLabs `creative_transcribe_audio` tool on the voice file for word times and match lines to the words.
 5. Film length is the voice length plus 1 second. Run `python3 scripts/mix.py <reel dir> <film seconds>`.
 6. Build `index.html` in the reel folder (visual rules below), using the voice's line times from `voiceover.lines.json` to time every beat. Use `assets/audio/mix.wav` as the only audio.
 7. Run `npx hyperframes lint`, then `npx hyperframes check`, and fix all errors. Run `npx hyperframes snapshot` at each beat and look at the frames: nothing cut off, no overlaps, text readable, nothing outside y 190 to 1540 on a 1920-tall stage.
