@@ -9,6 +9,9 @@ The series is "Desi Systems": how the systems Indians use every day really work,
 - Claude: how it writes an answer
 - Netflix: how it decides what to show you
 - MacBook battery: why it lasts so much longer than a Windows laptop, and what the on-device AI chip does
+- AI video generation: how a model turns a sentence into a video
+- Smart vs basic video models: why some are so much more advanced (data, size, training, how they handle motion and physics)
+- Higgsfield: how it works, using public information only
 - API: what it is, explained with an everyday app
 - MCP: how it lets an AI use your apps
 - RAG: how an AI looks things up before it answers
