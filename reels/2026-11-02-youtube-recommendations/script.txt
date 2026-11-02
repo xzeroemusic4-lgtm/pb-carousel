@@ -1,0 +1,14 @@
+आपने YouTube का अगला video हज़ारों बार देखा है पर कभी ध्यान नहीं दिया।
+इसे कौन चुनता है?
+Google के servers पर दो ए आई models मिलकर चुनते हैं।
+पहला model लाखों videos में से बस कुछ सौ छाँटता है।
+ये आपकी history और आप जैसे लोगों की पसंद देखता है।
+दूसरा model हर video को एक score देता है।
+आप click करोगे या नहीं और कितनी देर देखोगे।
+सबसे ऊँचे score वाले videos आपकी screen पर आते हैं।
+पर लंबा देखना ही सब कुछ नहीं है।
+YouTube surveys भेजकर पूछता है कि video कैसा लगा।
+Like और not interested से भी model सीखता है।
+हर बार app खोलने पर ये हिसाब फिर से चलता है।
+आपकी feed में सबसे अजीब recommendation क्या आया? Comment करो।
+Desi Systems के लिए follow करो।

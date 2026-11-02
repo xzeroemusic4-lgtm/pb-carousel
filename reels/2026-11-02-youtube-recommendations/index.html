@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="vendor/gsap.min.js"></script>
+    <style>
+      @font-face { font-family: "Space Grotesk"; src: url("assets/fonts/space-grotesk.woff2") format("woff2"); font-weight: 300 700; font-style: normal; }
+      @font-face { font-family: "JetBrains Mono"; src: url("assets/fonts/jetbrains-mono.woff2") format("woff2"); font-weight: 100 800; font-style: normal; }
+      :root { --bg: #0a1730; --ink: #eef3ff; --soft: #9fb0d4; --line: #24365c; --card: #12234a; --acc: #ff3b3b; --cy: #6fd3ff; }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--bg); }
+      #root { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: var(--bg); color: var(--ink); font-family: "Space Grotesk", sans-serif; }
+      #grid { position: absolute; inset: 0; background-image: linear-gradient(var(--line) 2px, transparent 2px), linear-gradient(90deg, var(--line) 2px, transparent 2px); background-size: 90px 90px; opacity: 0.35; }
+      .mono { font-family: "JetBrains Mono", monospace; }
+      #hdr { position: absolute; left: 80px; right: 80px; top: 210px; height: 50px; display: flex; justify-content: space-between; align-items: center; font-family: "JetBrains Mono", monospace; font-size: 28px; letter-spacing: 3px; font-weight: 600; border-bottom: 3px solid var(--ink); padding-bottom: 14px; }
+      #hdr b { color: var(--acc); }
+      #steps { display: flex; gap: 10px; }
+      #steps i { display: block; width: 34px; height: 8px; background: var(--line); border-radius: 4px; }
+      .scene { position: absolute; left: 80px; right: 80px; top: 320px; height: 1180px; opacity: 0; visibility: hidden; }
+      .kick { font-family: "JetBrains Mono", monospace; font-size: 30px; letter-spacing: 4px; font-weight: 700; color: var(--cy); text-transform: uppercase; }
+      .ttl { font-size: 88px; line-height: 1.05; font-weight: 700; letter-spacing: -2px; margin-top: 18px; }
+      .ttl span { display: inline-block; }
+      .ttl .a { color: var(--acc); }
+      .card { background: var(--card); border: 3px solid var(--line); border-radius: 26px; }
+      .tag { font-family: "JetBrains Mono", monospace; font-size: 28px; letter-spacing: 2px; font-weight: 700; color: var(--soft); }
+      .chip { display: inline-block; font-family: "JetBrains Mono", monospace; font-size: 36px; font-weight: 700; padding: 16px 24px; border: 3px solid var(--cy); color: var(--cy); border-radius: 16px; }
+      .btn { display: inline-block; font-size: 46px; font-weight: 700; padding: 26px 44px; border-radius: 60px; }
+      .ex { font-family: "JetBrains Mono", monospace; font-size: 28px; letter-spacing: 3px; color: var(--soft); }
+
+      /* s1: up next phone */
+      #s1 .phone { position: absolute; left: 150px; right: 150px; top: 330px; height: 800px; border: 6px solid var(--ink); border-radius: 56px; background: #07112a; padding: 40px 32px; }
+      #s1 .bar { display: flex; align-items: center; gap: 16px; font-size: 34px; font-weight: 700; margin-bottom: 30px; }
+      #s1 .bar svg { width: 72px; height: 72px; fill: #ff0000; }
+      #s1 .nx { font-family: "JetBrains Mono", monospace; font-size: 28px; letter-spacing: 3px; color: var(--soft); margin-bottom: 18px; }
+      #s1 .vid { display: flex; gap: 20px; margin-bottom: 24px; }
+      #s1 .th { width: 210px; height: 118px; border-radius: 14px; background: var(--line); flex: none; position: relative; }
+      #s1 .th::after { content: ""; position: absolute; left: 88px; top: 38px; border-left: 40px solid rgba(238,243,255,0.5); border-top: 22px solid transparent; border-bottom: 22px solid transparent; }
+      #s1 .vid i { display: block; height: 22px; border-radius: 11px; background: var(--line); margin: 14px 0 16px; }
+      #s1 .vid i + i { width: 60%; margin-top: 0; }
+      #s1 .vid.hot .th { background: var(--acc); }
+      #s1 .qm { position: absolute; right: -40px; top: -60px; width: 150px; height: 150px; border-radius: 75px; background: var(--acc); color: #fff; font-size: 100px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+
+      /* s2: google servers, two models */
+      #s2 .gl { position: absolute; left: 0; right: 0; top: 330px; display: flex; align-items: center; justify-content: center; gap: 22px; font-size: 48px; font-weight: 700; }
+      #s2 .gl svg { width: 70px; height: 70px; fill: #ffffff; }
+      #s2 .racks { position: absolute; left: 60px; right: 60px; top: 460px; display: flex; gap: 30px; justify-content: center; }
+      #s2 .rack { width: 230px; padding: 22px; border: 5px solid var(--ink); border-radius: 20px; background: var(--card); }
+      #s2 .rack div { height: 52px; border: 3px solid var(--soft); border-radius: 8px; margin-bottom: 14px; position: relative; }
+      #s2 .rack div:last-child { margin-bottom: 0; }
+      #s2 .rack div::after { content: ""; position: absolute; right: 14px; top: 16px; width: 14px; height: 14px; border-radius: 7px; background: var(--cy); }
+      #s2 .models { position: absolute; left: 0; right: 0; top: 880px; display: flex; gap: 40px; justify-content: center; }
+      #s2 .m { width: 400px; height: 170px; border-radius: 26px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: "JetBrains Mono", monospace; font-weight: 800; font-size: 44px; letter-spacing: 3px; }
+      #s2 .m small { font-size: 28px; letter-spacing: 2px; font-weight: 600; margin-top: 8px; }
+      #s2 .m1 { background: var(--cy); color: #07112a; }
+      #s2 .m2 { background: var(--acc); color: #fff; }
+
+      /* s3: funnel */
+      #s3 .tiles { position: absolute; left: 20px; right: 20px; top: 300px; display: grid; grid-template-columns: repeat(14, 1fr); gap: 8px; }
+      #s3 .tiles i { display: block; height: 34px; border-radius: 5px; background: var(--line); }
+      #s3 .tiles i.k { background: var(--cy); }
+      #s3 .lab { position: absolute; left: 0; right: 0; text-align: center; font-family: "JetBrains Mono", monospace; font-size: 34px; font-weight: 700; }
+      #s3 .l1 { top: 610px; color: var(--soft); }
+      #s3 .funnel { position: absolute; left: 260px; right: 260px; top: 670px; height: 140px; background: var(--cy); clip-path: polygon(0 0, 100% 0, 64% 100%, 36% 100%); opacity: 0.9; }
+      #s3 .l2 { top: 830px; color: var(--cy); }
+      #s3 .sig { position: absolute; left: 0; right: 0; top: 920px; display: flex; gap: 22px; justify-content: center; flex-wrap: wrap; }
+
+      /* s4: scoring */
+      #s4 .rows { position: absolute; left: 0; right: 0; top: 330px; display: flex; flex-direction: column; gap: 26px; }
+      #s4 .row { display: flex; align-items: center; gap: 24px; padding: 22px 26px; }
+      #s4 .th { width: 150px; height: 86px; border-radius: 12px; background: var(--line); flex: none; }
+      #s4 .row.top .th { background: var(--acc); }
+      #s4 .tr { flex: 1; height: 40px; border-radius: 20px; background: #07112a; overflow: hidden; }
+      #s4 .f { height: 100%; background: var(--cy); transform-origin: left center; transform: scaleX(0); }
+      #s4 .row.top .f { background: var(--acc); }
+      #s4 .n { width: 110px; text-align: right; font-family: "JetBrains Mono", monospace; font-size: 40px; font-weight: 800; }
+      #s4 .ex { position: absolute; right: 0; top: 290px; }
+      #s4 .qs { position: absolute; left: 0; right: 0; top: 1000px; display: flex; gap: 24px; justify-content: center; }
+      #s4 .win { position: absolute; left: 0; right: 0; top: 1110px; text-align: center; font-size: 44px; font-weight: 700; }
+      #s4 .win b { color: var(--acc); }
+
+      /* s5: feedback */
+      #s5 .wt { position: absolute; left: 0; right: 0; top: 290px; display: flex; align-items: center; gap: 22px; font-size: 44px; font-weight: 700; }
+      #s5 .wt .no { font-family: "JetBrains Mono", monospace; color: var(--acc); font-size: 40px; }
+      #s5 .survey { position: absolute; left: 60px; right: 60px; top: 420px; padding: 40px 44px; }
+      #s5 .survey .q { font-size: 50px; font-weight: 700; margin: 14px 0 30px; }
+      #s5 .stars { display: flex; gap: 22px; }
+      #s5 .stars i { display: block; width: 92px; height: 92px; background: var(--line); clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); }
+      #s5 .acts { position: absolute; left: 0; right: 0; top: 820px; display: flex; gap: 28px; justify-content: center; }
+      #s5 .act { font-size: 42px; font-weight: 700; padding: 22px 36px; border-radius: 50px; border: 4px solid var(--ink); }
+      #s5 .act.r { border-color: var(--acc); color: var(--acc); }
+      #s5 .arr { position: absolute; left: 50%; top: 950px; width: 6px; height: 90px; margin-left: -3px; background: var(--ink); transform-origin: top center; }
+      #s5 .arr::after { content: ""; position: absolute; left: -17px; bottom: -20px; border-left: 20px solid transparent; border-right: 20px solid transparent; border-top: 26px solid var(--ink); }
+      #s5 .mdl { position: absolute; left: 270px; right: 270px; top: 1070px; height: 100px; display: flex; align-items: center; justify-content: center; background: var(--cy); color: #07112a; border-radius: 22px; font-family: "JetBrains Mono", monospace; font-size: 40px; font-weight: 800; letter-spacing: 4px; }
+
+      /* s6: loop */
+      #s6 .ringw { position: absolute; left: 160px; top: 330px; width: 600px; height: 600px; }
+      #s6 .ring { position: absolute; inset: 0; border-radius: 50%; border: 8px dashed var(--cy); }
+      #s6 .dot { position: absolute; left: 50%; top: -18px; width: 36px; height: 36px; margin-left: -18px; border-radius: 18px; background: var(--acc); }
+      #s6 .spin { position: absolute; inset: 0; }
+      #s6 .nd { position: absolute; width: 260px; text-align: center; font-family: "JetBrains Mono", monospace; font-size: 32px; font-weight: 700; padding: 16px 10px; border-radius: 16px; background: var(--card); border: 3px solid var(--ink); }
+      #s6 .n1 { left: 170px; top: -40px; }
+      #s6 .n2 { left: 440px; top: 270px; }
+      #s6 .n3 { left: 170px; top: 530px; }
+      #s6 .n4 { left: -100px; top: 270px; }
+      #s6 .every { position: absolute; left: 0; right: 0; top: 1040px; text-align: center; font-size: 44px; font-weight: 700; color: var(--soft); }
+
+      /* s7: cta */
+      #s7 .ctas { position: absolute; left: 0; right: 0; top: 700px; display: flex; flex-direction: column; align-items: center; gap: 40px; }
+      #s7 .btn.k { background: var(--ink); color: #07112a; }
+      #s7 .btn.a { background: var(--acc); color: #fff; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="50.97" data-width="1080" data-height="1920">
+      <audio id="mix" src="assets/audio/mix.wav" data-start="0" data-duration="50.97" data-track-index="9" data-volume="1"></audio>
+      <div id="grid"></div>
+      <div id="hdr"><span>DESI <b>SYSTEMS</b></span><div id="steps"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+
+      <div class="scene" id="s1">
+        <div class="kick">Up next</div>
+        <div class="ttl"><span>Agla</span> <span>video</span> <span class="a">kaun</span> <span>chunta</span> <span>hai?</span></div>
+        <div class="phone">
+          <div class="bar"><svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg><span>YouTube</span></div>
+          <div class="nx">UP NEXT</div>
+          <div class="vid hot"><div class="th"></div><div style="flex:1"><i></i><i></i></div></div>
+          <div class="vid"><div class="th"></div><div style="flex:1"><i></i><i></i></div></div>
+          <div class="vid"><div class="th"></div><div style="flex:1"><i></i><i></i></div></div>
+          <div class="vid"><div class="th"></div><div style="flex:1"><i></i><i></i></div></div>
+          <div class="qm">?</div>
+        </div>
+      </div>
+
+      <div class="scene" id="s2">
+        <div class="kick">Backend</div>
+        <div class="ttl"><span>Do</span> <span class="a">AI</span> <span>models</span> <span>milkar</span></div>
+        <div class="gl"><svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"/></svg><span>Google servers</span></div>
+        <div class="racks">
+          <div class="rack"><div></div><div></div><div></div><div></div><div></div></div>
+          <div class="rack"><div></div><div></div><div></div><div></div><div></div></div>
+          <div class="rack"><div></div><div></div><div></div><div></div><div></div></div>
+        </div>
+        <div class="models">
+          <div class="m m1">MODEL 1<small>CHHAANTO</small></div>
+          <div class="m m2">MODEL 2<small>SCORE KARO</small></div>
+        </div>
+      </div>
+
+      <div class="scene" id="s3">
+        <div class="kick">Model 1 · candidates</div>
+        <div class="ttl"><span>Lakhon</span> <span>se</span> <span class="a">kuch</span> <span class="a">sau</span></div>
+        <div class="tiles"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="k"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="k"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="k"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="k"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="k"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="k"></i></div>
+        <div class="lab l1">LAKHON VIDEOS</div>
+        <div class="funnel"></div>
+        <div class="lab l2">KUCH SAU</div>
+        <div class="sig">
+          <div class="chip">Watch history</div>
+          <div class="chip">Aap jaise log</div>
+        </div>
+      </div>
+
+      <div class="scene" id="s4">
+        <div class="kick">Model 2 · ranking</div>
+        <div class="ttl"><span>Har</span> <span>video</span> <span>ko</span> <span class="a">score</span></div>
+        <div class="ex">EXAMPLE SCORES</div>
+        <div class="rows">
+          <div class="row card top"><div class="th"></div><div class="tr"><div class="f"></div></div><div class="n">0.91</div></div>
+          <div class="row card"><div class="th"></div><div class="tr"><div class="f"></div></div><div class="n">0.64</div></div>
+          <div class="row card"><div class="th"></div><div class="tr"><div class="f"></div></div><div class="n">0.38</div></div>
+          <div class="row card"><div class="th"></div><div class="tr"><div class="f"></div></div><div class="n">0.17</div></div>
+        </div>
+        <div class="qs"><div class="chip">Click karoge?</div><div class="chip">Kitni der dekhoge?</div></div>
+        <div class="win">Top score <b>→ aapki screen</b></div>
+      </div>
+
+      <div class="scene" id="s5">
+        <div class="kick">Feedback</div>
+        <div class="ttl"><span>Sirf</span> <span>watch</span> <span>time</span> <span class="a">nahi</span></div>
+        <div class="wt"><span>Lamba dekhna</span><span class="no">≠ SAB KUCH</span></div>
+        <div class="survey card">
+          <div class="tag">YOUTUBE SURVEY</div>
+          <div class="q">Ye video kaisa laga?</div>
+          <div class="stars"><i></i><i></i><i></i><i></i><i></i></div>
+        </div>
+        <div class="acts"><div class="act">👍 Like</div><div class="act r">Not interested</div></div>
+        <div class="arr"></div>
+        <div class="mdl">MODEL SEEKHTA</div>
+      </div>
+
+      <div class="scene" id="s6">
+        <div class="kick">Har baar</div>
+        <div class="ttl"><span>App</span> <span>kholo,</span> <span class="a">phir</span> <span class="a">se</span></div>
+        <div class="ringw">
+          <div class="ring"></div>
+          <div class="spin"><div class="dot"></div></div>
+          <div class="nd n1">APP OPEN</div>
+          <div class="nd n2">CHHAANTO</div>
+          <div class="nd n3">SCORE</div>
+          <div class="nd n4">FEED</div>
+        </div>
+        <div class="every">Har refresh pe naya hisaab</div>
+      </div>
+
+      <div class="scene" id="s7">
+        <div class="kick">Aapki baari</div>
+        <div class="ttl"><span>Aapki</span> <span>feed</span> <span>ka</span> <span>sabse</span> <span class="a">ajeeb</span> <span class="a">recommendation?</span></div>
+        <div class="ctas">
+          <div class="btn k" id="cm">Comment karo</div>
+          <div class="btn a" id="fl">+ Follow · Desi Systems</div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const DUR = 50.97;
+      const LEAD = 0.08;
+      const T = (t) => Math.max(0, t - LEAD);
+      const tl = gsap.timeline({ paused: true });
+      const qa = (s) => Array.from(document.querySelectorAll(s));
+      tl.set({}, {}, DUR);
+
+      // scene windows: each change after the last word of a sentence ends
+      const SCENES = [
+        ["#s1", 0, 6.3],
+        ["#s2", 6.45, 10.85],
+        ["#s3", 10.95, 19.2],
+        ["#s4", 19.3, 29.2],
+        ["#s5", 29.3, 38.95],
+        ["#s6", 39.05, 43.3],
+        ["#s7", 43.4, DUR + 1]
+      ];
+      const steps = qa("#steps i");
+      SCENES.forEach(([sel, a, b], i) => {
+        if (a === 0) tl.set(sel, { autoAlpha: 1 }, 0);
+        else tl.fromTo(sel, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.2, ease: "none", immediateRender: false }, a);
+        if (b < DUR) tl.to(sel, { autoAlpha: 0, duration: 0.15, ease: "none" }, b);
+        tl.set(steps[i], { backgroundColor: "#ff3b3b" }, a);
+      });
+
+      function rv(target, t, from) {
+        tl.fromTo(target, Object.assign({ autoAlpha: 0, y: 26 }, from || {}), { autoAlpha: 1, y: 0, x: 0, scale: 1, duration: 0.28, ease: "power2.out", immediateRender: true }, T(t));
+      }
+      function words(sel, t0, t1) {
+        const w = qa(sel + " .ttl span");
+        w.forEach((el, i) => rv(el, t0 + ((t1 - t0) * i) / w.length));
+      }
+
+      // S1 hook: L1 0.08-4.46, L2 5.16-5.96
+      rv("#s1 .kick", 0.08);
+      words("#s1", 0.08, 1.5);
+      rv("#s1 .phone", 0.4, { y: 60 });
+      qa("#s1 .vid").forEach((el, i) => rv(el, 1.2 + i * 0.2, { x: 40, y: 0 }));
+      tl.to("#s1 .vid.hot", { scale: 1.04, duration: 0.25, ease: "power2.out" }, T(3.5));
+      rv("#s1 .qm", 5.16, { scale: 0.3, y: 0 });
+
+      // S2 L3 6.90-10.5
+      rv("#s2 .kick", 6.9);
+      words("#s2", 8.58, 9.96);
+      rv("#s2 .gl", 6.9);
+      qa("#s2 .rack").forEach((el, i) => rv(el, 7.56 + i * 0.12, { y: 50 }));
+      rv("#s2 .m1", 9.28, { scale: 0.8, y: 0 });
+      rv("#s2 .m2", 9.6, { scale: 0.8, y: 0 });
+
+      // S3 L4 11.06-14.88, L5 15.48-18.9
+      rv("#s3 .kick", 11.06);
+      words("#s3", 12.38, 14.2);
+      tl.fromTo("#s3 .tiles", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.28, ease: "none", immediateRender: true }, T(12.38));
+      rv("#s3 .l1", 12.6);
+      rv("#s3 .funnel", 13.5, { y: -20 });
+      qa("#s3 .tiles i:not(.k)").forEach((el) => tl.to(el, { opacity: 0.25, duration: 0.3, ease: "none" }, T(14.12)));
+      rv("#s3 .l2", 14.12);
+      qa("#s3 .chip").forEach((el, i) => rv(el, i ? 17.12 : 15.96, { scale: 0.8, y: 0 }));
+
+      // S4 L6 19.42-21.8, L7 22.20-24.56, L8 25.58-28.9
+      rv("#s4 .kick", 19.42);
+      words("#s4", 19.42, 21.14);
+      rv("#s4 .ex", 20.46);
+      const P = [0.91, 0.64, 0.38, 0.17];
+      qa("#s4 .row").forEach((el, i) => {
+        rv(el, 20.46 + i * 0.12, { x: -40, y: 0 });
+        tl.fromTo(el.querySelector(".f"), { scaleX: 0 }, { scaleX: P[i], duration: 0.3, ease: "power2.out", immediateRender: true }, T(21.14 + i * 0.1));
+      });
+      qa("#s4 .qs .chip").forEach((el, i) => rv(el, i ? 23.58 : 22.36, { scale: 0.8, y: 0 }));
+      rv("#s4 .win", 25.58);
+      tl.to("#s4 .row.top", { borderColor: "#ff3b3b", scale: 1.03, duration: 0.25, ease: "power2.out" }, T(26.46));
+
+      // S5 L9 29.40-31.28, L10 31.94-35.40, L11 36.34-38.7
+      rv("#s5 .kick", 29.4);
+      words("#s5", 29.4, 30.9);
+      rv("#s5 .wt", 29.64);
+      rv("#s5 .survey", 31.94, { y: 50 });
+      qa("#s5 .stars i").forEach((el, i) => tl.to(el, { backgroundColor: "#ffc93c", duration: 0.12, ease: "none" }, T(34.46 + i * 0.12)));
+      rv("#s5 .act:not(.r)", 36.34, { scale: 0.8, y: 0 });
+      rv("#s5 .act.r", 36.86, { scale: 0.8, y: 0 });
+      tl.fromTo("#s5 .arr", { scaleY: 0 }, { scaleY: 1, duration: 0.25, ease: "power2.out", immediateRender: true }, T(37.88));
+      rv("#s5 .mdl", 38.2, { scale: 0.85, y: 0 });
+
+      // S6 L12 39.24-42.06
+      rv("#s6 .kick", 39.24);
+      words("#s6", 39.24, 41.2);
+      rv("#s6 .ring", 39.4, { scale: 0.8, y: 0 });
+      qa("#s6 .nd").forEach((el, i) => rv(el, 39.6 + i * 0.25, { scale: 0.7, y: 0 }));
+      tl.fromTo("#s6 .spin", { rotation: 0 }, { rotation: 720, duration: 3.6, ease: "none", immediateRender: true }, T(39.6));
+      rv("#s6 .every", 40.78);
+
+      // S7 L13 43.58-48.0, L14 48.06-49.60
+      rv("#s7 .kick", 43.58);
+      words("#s7", 43.58, 46.1);
+      rv("#cm", 46.96, { scale: 0.8, y: 0 });
+      rv("#fl", 48.06, { scale: 0.8, y: 0 });
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>
