@@ -9,6 +9,11 @@ The series is "Desi Systems": how the systems Indians use every day really work,
 - Claude: how it writes an answer
 - Netflix: how it decides what to show you
 - MacBook battery: why it lasts so much longer than a Windows laptop, and what the on-device AI chip does
+- API: what it is, explained with an everyday app
+- MCP: how it lets an AI use your apps
+- RAG: how an AI looks things up before it answers
+- Tesla car: how it drives with cameras and AI
+- Tesla robot (Optimus): how it works, and what is still unproven
 - Swiggy: how food reaches you so fast, and how the delivery time is predicted
 - Uber: how the nearest rider is found for you in seconds
 - Grocery apps: how delivery gets so fast, and how the app decides what each dark store stocks

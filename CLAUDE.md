@@ -34,7 +34,7 @@ You run alone in the cloud. Nobody answers questions during a run. Make one fini
 ## Script rules
 
 - For Indians. Casual Hinglish. Everyday Indian situations and references. Never copy another creator's words.
-- Connect every reel to AI: show where AI or machine learning does the real work in the system, not just a curious fact. Only claim what you can confirm. If a topic has no real AI link, say what AI is changing or could change there, and mark that as a possibility.
+- Connect every reel to AI or the backend: show how the technology really works underneath (the model, the data, the servers, the API calls), not just a curious fact. For company claims such as Tesla's, report only what is publicly confirmed and say plainly what is a plan or a claim. Only claim what you can confirm. If a topic has no real AI link, say what AI is changing or could change there, and mark that as a possibility.
 - At most 60 seconds: about 19 short lines. Open with the most surprising truth, in question or challenge form, inside the first 3 seconds.
 - Hooks: the opening should make viewers feel they are missing something other people have missed. Use one pattern from the list below or a new one in the same spirit, always tied to the day's topic in the same breath. Never use a pattern on its own, and do not repeat the pattern of the last 3 reels (check the `script.txt` files in `reels/`). Use a pattern only if it is true for the topic.
   - बहुत ही कम लोगों को इसके बारे में पता है।
