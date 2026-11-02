@@ -5,7 +5,8 @@ import numpy as np, soundfile as sf
 D, DUR = sys.argv[1], float(sys.argv[2])
 A = f"{D}/assets/audio"
 SR = 48000
-SPEECH_DB, PAUSE_DB = -24, -20  # bed gain under speech and in the gaps
+MUSIC_BELOW_VOICE_DB = 10  # under speech the bed sits this far below the voice's loudness (Prince asked for -10 dB)
+GAP_LIFT_DB = 4            # the bed rises this much in the gaps between lines
 
 
 def load(path):
@@ -25,6 +26,14 @@ n = int(DUR * SR)
 voice = np.zeros((n, 2), "float32")
 v = load(f"{A}/voiceover.wav")[:n]
 voice[: len(v)] = v
+bed_raw = load(f"{A}/music-bed.mp3")[:n]
+with tempfile.TemporaryDirectory() as d0:
+    sf.write(f"{d0}/v.wav", voice, SR, subtype="FLOAT")
+    sf.write(f"{d0}/b.wav", bed_raw, SR, subtype="FLOAT")
+    voice_lufs, bed_lufs = measure(f"{d0}/v.wav")[0], measure(f"{d0}/b.wav")[0]
+SPEECH_DB = (voice_lufs - MUSIC_BELOW_VOICE_DB) - bed_lufs
+PAUSE_DB = SPEECH_DB + GAP_LIFT_DB
+print(f"voice {voice_lufs:.1f} LUFS, bed {bed_lufs:.1f} LUFS, bed gain {SPEECH_DB:.1f} dB under speech, {PAUSE_DB:.1f} dB in gaps")
 target = np.full(n, PAUSE_DB, "float32")
 for line in json.load(open(f"{A}/voiceover.lines.json")):
     target[int(line["start"] * SR): int(line["end"] * SR)] = SPEECH_DB
@@ -32,7 +41,7 @@ smooth = int(0.22 * SR)
 env = np.convolve(target, np.ones(smooth) / smooth, "same")
 env[:smooth], env[-smooth:] = target[smooth], PAUSE_DB
 # The bed is an original track, 80 s long, so there is no licence limit on looping or remixing.
-bed = load(f"{A}/music-bed.mp3")[:n] * (10 ** (env / 20))[:, None]
+bed = bed_raw * (10 ** (env / 20))[:, None]
 fade = int(1.2 * SR)
 bed[-fade:] *= np.linspace(1, 0, fade)[:, None]
 bed[:240] *= np.linspace(0, 1, 240)[:, None]

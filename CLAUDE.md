@@ -68,7 +68,7 @@ Two runs a day. The 7:00 AM India run publishes at 8:00 AM, and the 5:00 PM Indi
 - Text leads the voice by about 0.08 s, and a reveal lasts at most 0.3 s.
 - Scenes change only after the last word of a sentence has finished.
 - Fully seekable and deterministic: no `Date.now()`, no `Math.random()`, no network. `render(t)` never draws inside the GSAP setter.
-- Music stays low, with no sound effects.
+- Music sits 10 dB below the voice under speech (mix.py does this), with no sound effects.
 
 ## Rules
 
