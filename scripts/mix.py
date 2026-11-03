@@ -26,7 +26,16 @@ n = int(DUR * SR)
 voice = np.zeros((n, 2), "float32")
 v = load(f"{A}/voiceover.wav")[:n]
 voice[: len(v)] = v
-bed_raw = load(f"{A}/music-bed.mp3")[:n]
+bed_raw = load(f"{A}/music-bed.mp3")
+# Reels can now run up to 2 minutes and each track is a 70 s section, so loop the bed with a 2 s crossfade.
+xf = int(2.0 * SR)
+while len(bed_raw) < n:
+    seg = load(f"{A}/music-bed.mp3")
+    ramp = np.linspace(0, 1, xf, dtype="float32")[:, None]
+    head = bed_raw[:-xf]
+    joint = bed_raw[-xf:] * (1 - ramp) + seg[:xf] * ramp
+    bed_raw = np.concatenate([head, joint, seg[xf:]])
+bed_raw = bed_raw[:n]
 with tempfile.TemporaryDirectory() as d0:
     sf.write(f"{d0}/v.wav", voice, SR, subtype="FLOAT")
     sf.write(f"{d0}/b.wav", bed_raw, SR, subtype="FLOAT")

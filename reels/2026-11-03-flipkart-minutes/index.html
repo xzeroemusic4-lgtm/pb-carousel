@@ -1,0 +1,563 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="vendor/gsap.min.js"></script>
+    <style>
+      @font-face {
+        font-family: "Space Grotesk";
+        src: url("assets/fonts/space-grotesk.woff2") format("woff2");
+        font-weight: 300 700;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: "JetBrains Mono";
+        src: url("assets/fonts/jetbrains-mono.woff2") format("woff2");
+        font-weight: 100 800;
+        font-style: normal;
+      }
+      :root {
+        --bg: #0a1530;
+        --ink: #eef2ff;
+        --soft: #9aa8c8;
+        --line: #26386a;
+        --card: #12224a;
+        --acc: #ffc83d;
+        --dark: #0a1530;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--bg); }
+      #root {
+        position: relative; width: 1080px; height: 1920px; overflow: hidden;
+        background: var(--bg); color: var(--ink); font-family: "Space Grotesk", sans-serif;
+      }
+      #grid {
+        position: absolute; inset: 0;
+        background-image: linear-gradient(rgba(120, 150, 220, 0.07) 2px, transparent 2px), linear-gradient(90deg, rgba(120, 150, 220, 0.07) 2px, transparent 2px);
+        background-size: 60px 60px;
+      }
+      #hdr {
+        position: absolute; left: 80px; right: 80px; top: 210px; height: 50px;
+        display: flex; justify-content: space-between; align-items: center;
+        font-family: "JetBrains Mono", monospace; font-size: 28px; letter-spacing: 2px; font-weight: 600;
+        border-bottom: 3px solid var(--ink); padding-bottom: 14px;
+      }
+      #hdr b { color: var(--acc); }
+      #steps { display: flex; gap: 6px; }
+      #steps i { display: block; width: 18px; height: 8px; background: var(--line); border-radius: 4px; }
+      .scene { position: absolute; left: 80px; right: 80px; top: 320px; height: 1180px; opacity: 0; visibility: hidden; }
+      .kick { font-family: "JetBrains Mono", monospace; font-size: 30px; letter-spacing: 4px; font-weight: 700; color: var(--acc); text-transform: uppercase; }
+      .ttl { font-size: 84px; line-height: 1.06; font-weight: 700; letter-spacing: -2px; margin-top: 18px; }
+      .ttl span { display: inline-block; }
+      .ttl .a { color: var(--acc); }
+      .body { position: absolute; left: 0; right: 0; }
+      .card { background: var(--card); border: 3px solid var(--line); border-radius: 28px; padding: 34px 40px; }
+      .card.a { background: var(--acc); border-color: var(--acc); color: var(--dark); }
+      .big { font-size: 54px; font-weight: 700; line-height: 1.15; }
+      .mid { font-size: 44px; font-weight: 700; line-height: 1.2; }
+      .tag { font-family: "JetBrains Mono", monospace; font-size: 28px; letter-spacing: 2px; font-weight: 700; color: var(--soft); text-transform: uppercase; }
+      .chip { display: inline-block; font-family: "JetBrains Mono", monospace; font-size: 38px; font-weight: 700; padding: 16px 24px; border: 3px solid var(--ink); border-radius: 16px; background: var(--card); }
+      .chip.a { background: var(--acc); border-color: var(--acc); color: var(--dark); }
+      .btn { display: inline-block; font-size: 46px; font-weight: 700; padding: 26px 44px; border-radius: 60px; }
+      .btn.k { background: var(--ink); color: var(--dark); }
+      .btn.a { background: var(--acc); color: var(--dark); }
+      .strike { position: absolute; left: 30px; right: 30px; top: 50%; height: 8px; background: var(--acc); transform-origin: left center; transform: scaleX(0); }
+      .stamp { position: absolute; right: 30px; top: -44px; transform: rotate(-8deg); font-family: "JetBrains Mono", monospace; font-size: 46px; font-weight: 800; color: var(--dark); background: var(--acc); padding: 10px 24px; border-radius: 12px; }
+      .row { display: flex; align-items: center; gap: 26px; }
+      .no { flex: none; width: 76px; height: 76px; border-radius: 38px; background: var(--acc); color: var(--dark); display: flex; align-items: center; justify-content: center; font-family: "JetBrains Mono", monospace; font-size: 38px; font-weight: 800; }
+      .arrow { font-family: "JetBrains Mono", monospace; font-size: 60px; font-weight: 800; color: var(--acc); text-align: center; }
+      .dot { position: absolute; width: 44px; height: 44px; border-radius: 22px; border: 6px solid var(--ink); background: var(--bg); }
+      .dot.a { background: var(--acc); border-color: var(--acc); }
+      .lbl { position: absolute; font-family: "JetBrains Mono", monospace; font-size: 28px; font-weight: 700; letter-spacing: 1px; }
+      .map { position: absolute; left: 0; right: 0; border: 3px solid var(--line); border-radius: 28px; background: var(--card); overflow: hidden; }
+      .map .roads { position: absolute; inset: 0; background-image: linear-gradient(var(--line) 4px, transparent 4px), linear-gradient(90deg, var(--line) 4px, transparent 4px); background-size: 150px 150px; opacity: 0.6; }
+
+      /* s1 */
+      #s1 .timer { top: 420px; display: flex; justify-content: center; }
+      #s1 .ring { width: 330px; height: 330px; border-radius: 165px; border: 18px solid var(--line); border-top-color: var(--acc); border-right-color: var(--acc); display: flex; align-items: center; justify-content: center; }
+      #s1 .ring b { font-family: "JetBrains Mono", monospace; font-size: 80px; font-weight: 800; color: var(--acc); }
+      #s1 .brand { top: 800px; text-align: center; }
+      #s1 .brand span { font-size: 48px; font-weight: 700; letter-spacing: 1px; }
+      #s1 .hid { top: 920px; }
+      /* s2 */
+      #s2 .list { top: 360px; display: flex; flex-direction: column; gap: 20px; }
+      #s2 .card { padding: 18px 30px; }
+      #s2 .card .mid { font-size: 42px; }
+      /* s3 */
+      #s3 .myth { top: 360px; }
+      #s3 .map { top: 640px; height: 520px; }
+      /* s4 */
+      #s4 .store { top: 360px; }
+      #s4 .shelves { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 24px; }
+      #s4 .sh { height: 104px; border: 3px solid var(--ink); border-radius: 14px; background: var(--bg); display: flex; align-items: center; justify-content: center; font-family: "JetBrains Mono", monospace; font-size: 30px; font-weight: 700; }
+      #s4 .store .card { position: relative; }
+      #s4 .stamp { top: -36px; }
+      #s4 .note { top: 1000px; }
+      /* s5 */
+      #s5 .src { top: 470px; }
+      #s5 .ans { top: 540px; }
+      #s5 .ans .card { font-size: 70px; font-weight: 700; line-height: 1.1; text-align: center; padding: 50px 40px; }
+      #s5 .ex { top: 860px; }
+      /* s6 */
+      #s6 .ins { top: 260px; display: flex; flex-wrap: wrap; gap: 18px; justify-content: center; }
+      #s6 .ar1 { top: 470px; }
+      #s6 .model { top: 550px; }
+      #s6 .model .card { text-align: center; font-family: "JetBrains Mono", monospace; font-size: 48px; font-weight: 800; letter-spacing: 3px; padding: 26px; }
+      #s6 .ar2 { top: 690px; }
+      #s6 .out { top: 770px; }
+      #s6 .bars { display: flex; flex-direction: column; gap: 18px; margin-top: 16px; }
+      #s6 .br { display: flex; align-items: center; gap: 22px; font-size: 38px; font-weight: 700; }
+      #s6 .br .n { width: 190px; }
+      #s6 .br .t { flex: 1; height: 50px; border: 3px solid var(--ink); border-radius: 12px; overflow: hidden; }
+      #s6 .br .f { display: block; height: 100%; width: 100%; background: var(--acc); transform-origin: left center; transform: scaleX(0); }
+      #s6 .ex { top: 1130px; }
+      /* s7 */
+      #s7 .note { top: 360px; }
+      #s7 .flow { top: 640px; display: flex; align-items: center; justify-content: space-between; }
+      #s7 .phone { width: 300px; height: 470px; border: 6px solid var(--ink); border-radius: 46px; background: var(--card); position: relative; }
+      #s7 .phone .pin { position: absolute; left: 110px; top: 150px; width: 70px; height: 70px; border-radius: 35px 35px 35px 0; transform: rotate(-45deg); background: var(--acc); }
+      #s7 .phone .t { position: absolute; left: 0; right: 0; top: 280px; text-align: center; font-size: 34px; font-weight: 700; }
+      #s7 .pkt { position: absolute; left: 300px; top: 556px; }
+      #s7 .srv { width: 300px; display: flex; flex-direction: column; gap: 14px; }
+      #s7 .srv i { display: block; height: 96px; border: 5px solid var(--ink); border-radius: 14px; background: var(--card); position: relative; }
+      #s7 .srv i::after { content: ""; position: absolute; right: 22px; top: 36px; width: 18px; height: 18px; border-radius: 9px; background: var(--acc); }
+      #s7 .srvl { position: absolute; left: auto; right: 0; top: 1130px; width: 300px; text-align: center; }
+      /* s8 */
+      #s8 .map { top: 340px; height: 470px; }
+      #s8 .zone { position: absolute; width: 300px; height: 300px; border-radius: 150px; border: 4px dashed var(--soft); }
+      #s8 .zone.a { border: 5px solid var(--acc); background: rgba(255, 200, 61, 0.12); }
+      #s8 .addr { top: 850px; display: flex; gap: 20px; }
+      #s8 .addr .card { flex: 1; padding: 22px 26px; }
+      #s8 .ex { top: 1040px; }
+      #s8 .stock { top: 850px; }
+      /* s9 */
+      #s9 .code { top: 360px; }
+      #s9 pre { font-family: "JetBrains Mono", monospace; font-size: 36px; line-height: 1.45; font-weight: 600; color: var(--ink); }
+      #s9 pre b { color: var(--acc); }
+      #s9 .ex1 { top: 700px; }
+      #s9 .lock { top: 770px; }
+      #s9 .lock .card { display: flex; align-items: center; gap: 30px; }
+      #s9 .lk { flex: none; width: 110px; height: 110px; position: relative; }
+      #s9 .lk .sh { position: absolute; left: 22px; top: 0; width: 66px; height: 66px; border: 12px solid var(--acc); border-bottom: none; border-radius: 34px 34px 0 0; }
+      #s9 .lk .bd { position: absolute; left: 0; top: 50px; width: 110px; height: 60px; border-radius: 12px; background: var(--acc); }
+      #s9 .other { top: 1010px; }
+      /* s10 */
+      #s10 .ph { top: 340px; left: 80px; right: 80px; border: 6px solid var(--ink); border-radius: 46px; background: var(--card); padding: 40px 36px; }
+      #s10 .it { display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid var(--line); padding: 22px 6px; font-size: 40px; font-weight: 700; }
+      #s10 .it .sl { font-family: "JetBrains Mono", monospace; font-size: 32px; color: var(--acc); }
+      #s10 .ok { font-family: "JetBrains Mono", monospace; font-size: 30px; font-weight: 800; color: var(--dark); background: var(--acc); padding: 6px 14px; border-radius: 10px; margin-left: 16px; }
+      #s10 .beam { position: absolute; left: 36px; right: 36px; top: 150px; height: 8px; background: var(--acc); border-radius: 4px; opacity: 0; }
+      #s10 .ex { top: 1010px; }
+      /* s11 */
+      #s11 .rid { top: 340px; display: flex; flex-direction: column; gap: 20px; }
+      #s11 .rid .card { display: flex; justify-content: space-between; align-items: center; padding: 26px 34px; }
+      #s11 .rid .st { font-family: "JetBrains Mono", monospace; font-size: 32px; font-weight: 800; }
+      #s11 .ex { top: 830px; }
+      #s11 .wait { top: 900px; }
+      /* s12 */
+      #s12 .map { top: 340px; height: 640px; }
+      #s12 svg { position: absolute; inset: 0; }
+      #s12 .eta { top: 1020px; }
+      /* s13 */
+      #s13 .loop { top: 380px; height: 700px; }
+      #s13 .lring { position: absolute; left: 160px; top: 80px; width: 600px; height: 600px; border-radius: 300px; border: 10px dashed var(--line); }
+      #s13 .nd { position: absolute; width: 300px; text-align: center; }
+      /* s14 */
+      #s14 .c1 { top: 470px; }
+      #s14 .c1 .card { position: relative; text-align: center; }
+      #s14 .c2 { top: 760px; }
+      #s14 .c2 .card { text-align: center; }
+      /* s15 */
+      #s15 .ctas { top: 640px; display: flex; flex-direction: column; align-items: flex-start; gap: 40px; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="105.7" data-width="1080" data-height="1920">
+      <audio id="mix" src="assets/audio/mix.wav" data-start="0" data-duration="105.7" data-track-index="9" data-volume="1"></audio>
+      <div id="grid"></div>
+      <div id="hdr"><span>UNSEEN ENGINE · <b>MINUTES</b></span><span id="steps"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
+
+      <div class="scene" id="s1">
+        <div class="kick">10 minute delivery</div>
+        <div class="ttl"><span>10</span> <span>minute</span> <span>mein</span> <span class="a">groceries</span> <span>kaise?</span></div>
+        <div class="body timer"><div class="ring"><b>10:00</b></div></div>
+        <div class="body brand"><span>Flipkart Minutes</span></div>
+        <div class="body hid"><div class="card a big">Peeche ek system hai jo dikhta nahi</div></div>
+      </div>
+
+      <div class="scene" id="s2">
+        <div class="kick">Order se delivery tak</div>
+        <div class="ttl"><span>Poora</span> <span class="a">backend</span> <span>step</span> <span>by</span> <span>step</span></div>
+        <div class="body list">
+          <div class="card row"><span class="no">1</span><span class="mid">Forecast: store mein kya rakhein</span></div>
+          <div class="card row"><span class="no">2</span><span class="mid">Location: kaunsa store</span></div>
+          <div class="card row"><span class="no">3</span><span class="mid">API call: stock lock</span></div>
+          <div class="card row"><span class="no">4</span><span class="mid">Picker: scan aur pack</span></div>
+          <div class="card row"><span class="no">5</span><span class="mid">Rider: route aur GPS</span></div>
+          <div class="card row"><span class="no">6</span><span class="mid">Data: agla forecast</span></div>
+        </div>
+      </div>
+
+      <div class="scene" id="s3">
+        <div class="kick">Speed ka raaz</div>
+        <div class="ttl"><span>Rider</span> <span>race</span> <span>nahi</span> <span>lagata</span></div>
+        <div class="body myth"><div class="card big" style="position: relative; text-align: center">Full speed race?<div class="strike"></div><div class="stamp">NAHI</div></div></div>
+        <div class="map">
+          <div class="roads"></div>
+          <div class="dot" id="hm" style="left: 220px; top: 280px"></div>
+          <div class="lbl" style="left: 170px; top: 350px">GHAR</div>
+          <div class="dot a" id="ds" style="left: 620px; top: 210px"></div>
+          <div class="lbl" style="left: 540px; top: 140px; color: var(--acc)">DARK STORE</div>
+          <div id="ln3" style="position: absolute; left: 262px; top: 292px; width: 362px; height: 6px; background: var(--acc); transform-origin: left center; "></div>
+          <div class="lbl" id="near" style="left: 40px; top: 440px; font-size: 34px">SAAMAAN PEHLE SE PAAS</div>
+        </div>
+      </div>
+
+      <div class="scene" id="s4">
+        <div class="kick">Dark store</div>
+        <div class="ttl"><span>Colony</span> <span>ke</span> <span>paas</span> <span>ek</span> <span class="a">dark</span> <span class="a">store</span></div>
+        <div class="body store">
+          <div class="card">
+            <div class="tag">Example items</div>
+            <div class="shelves">
+              <div class="sh">Doodh</div><div class="sh">Bread</div><div class="sh">Atta</div>
+              <div class="sh">Anda</div><div class="sh">Chawal</div><div class="sh">Biscuit</div>
+              <div class="sh">Sabzi</div><div class="sh">Chai patti</div><div class="sh">Sabun</div>
+            </div>
+            <div class="stamp">NO CUSTOMERS</div>
+          </div>
+        </div>
+        <div class="body note"><div class="card mid">Sirf orders pack hote hain</div></div>
+      </div>
+
+      <div class="scene" id="s5">
+        <div class="kick">Kaun tay karta hai?</div>
+        <div class="ttl"><span>Kya</span> <span>rakhna</span> <span>hai?</span> <span class="a">Kaun</span> <span class="a">tay</span> <span class="a">karta?</span></div>
+        <div class="body src"><span class="tag">Flipkart Minutes ke mutaabik</span></div>
+        <div class="body ans"><div class="card a">AI demand forecasting</div></div>
+        <div class="body ex"><div class="card mid">Pehle se andaaza</div></div>
+      </div>
+
+      <div class="scene" id="s6">
+        <div class="kick">Forecast model · aamtaur par</div>
+        <div class="ttl"><span>Model</span> <span>kya</span> <span class="a">padhta</span> <span>hai?</span></div>
+        <div class="body ins"><span class="chip" id="i1">Purane orders</span><span class="chip" id="i2">Tyohaar</span><span class="chip" id="i3">Mausam</span></div>
+        <div class="body arrow ar1">↓</div>
+        <div class="body model"><div class="card a">MODEL</div></div>
+        <div class="body arrow ar2">↓</div>
+        <div class="body out">
+          <div class="tag">Har store ka andaaza</div>
+          <div class="bars">
+            <div class="br"><span class="n">Doodh</span><span class="t"><span class="f"></span></span></div>
+            <div class="br"><span class="n">Bread</span><span class="t"><span class="f"></span></span></div>
+            <div class="br"><span class="n">Chips</span><span class="t"><span class="f"></span></span></div>
+          </div>
+        </div>
+        <div class="body ex"><span class="tag">Example bars · samjhane ke liye</span></div>
+      </div>
+
+      <div class="scene" id="s7">
+        <div class="kick">Aage ke steps</div>
+        <div class="ttl"><span>Quick</span> <span>commerce</span> <span>ka</span> <span class="a">usual</span> <span class="a">tareeka</span></div>
+        <div class="body note" style="top: 400px"><span class="tag">Ye steps aamtaur par aise chalte hain</span></div>
+        <div class="body flow">
+          <div class="phone"><div class="pin"></div><div class="t">App khola</div></div>
+          <div class="arrow">→</div>
+          <div class="srv"><i></i><i></i><i></i><i></i></div>
+        </div>
+        <div class="pkt"><span class="chip a">location</span></div>
+        <div class="body srvl"><span class="tag">Server</span></div>
+      </div>
+
+      <div class="scene" id="s8">
+        <div class="kick">Kaunsa store?</div>
+        <div class="ttl"><span>Aapka</span> <span>area</span> <span class="a">→</span> <span>ek</span> <span class="a">dark</span> <span class="a">store</span></div>
+        <div class="map">
+          <div class="roads"></div>
+          <div class="zone" style="left: 20px; top: 80px"></div>
+          <div class="zone a" id="za" style="left: 310px; top: 120px"></div>
+          <div class="zone" style="left: 600px; top: 60px"></div>
+          <div class="dot" style="left: 148px; top: 208px"></div>
+          <div class="dot a" style="left: 438px; top: 248px"></div>
+          <div class="dot" style="left: 728px; top: 188px"></div>
+          <div class="dot" id="me" style="left: 520px; top: 330px; width: 30px; height: 30px; border-width: 5px"></div>
+          <div class="lbl" id="mel" style="left: 560px; top: 330px">AAP</div>
+        </div>
+        <div class="body addr">
+          <div class="card"><div class="tag">Address 1</div><div class="mid">9 min</div></div>
+          <div class="card"><div class="tag">Address 2</div><div class="mid">14 min</div></div>
+        </div>
+        <div class="body ex"><span class="tag">Example times · har address alag</span></div>
+        <div class="body stock"><div class="card a mid">App mein jo dikhta hai = usi store ka stock</div></div>
+      </div>
+
+      <div class="scene" id="s9">
+        <div class="kick">API call</div>
+        <div class="ttl"><span>Pay</span> <span class="a">→</span> <span>API</span> <span>call</span></div>
+        <div class="body code"><div class="card"><pre>POST <b>/order</b>
+{ store: "B", items: ["doodh"] }</pre></div></div>
+        <div class="body ex1"><span class="tag">Example request</span></div>
+        <div class="body lock"><div class="card"><div class="lk"><div class="sh"></div><div class="bd"></div></div><div class="mid">Packet aapke naam LOCK</div></div></div>
+        <div class="body other"><div class="card a mid">Taaki wahi packet kisi aur ko na bike</div></div>
+      </div>
+
+      <div class="scene" id="s10">
+        <div class="kick">Store ke andar</div>
+        <div class="ttl"><span>Order</span> <span class="a">picker</span> <span>ke</span> <span>phone</span> <span>par</span></div>
+        <div class="body ph">
+          <div class="tag">Pick list · example</div>
+          <div class="it" id="p1"><span>Doodh</span><span><span class="sl">Shelf A3</span><span class="ok">SCAN ✓</span></span></div>
+          <div class="it" id="p2"><span>Bread</span><span><span class="sl">Shelf B1</span><span class="ok">SCAN ✓</span></span></div>
+          <div class="it" id="p3"><span>Chips</span><span><span class="sl">Shelf C4</span><span class="ok">SCAN ✓</span></span></div>
+          <div class="beam"></div>
+        </div>
+        <div class="body ex"><div class="card mid">Scan = sahi item</div></div>
+      </div>
+
+      <div class="scene" id="s11">
+        <div class="kick">Rider</div>
+        <div class="ttl"><span>Paas</span> <span>wala</span> <span class="a">free</span> <span class="a">rider</span></div>
+        <div class="body rid">
+          <div class="card" id="r1"><span class="mid">Rider 1</span><span class="st" style="color: var(--soft)">BUSY</span></div>
+          <div class="card" id="r2"><span class="mid">Rider 2</span><span class="st">FREE · 0.2 KM</span></div>
+          <div class="card" id="r3"><span class="mid">Rider 3</span><span class="st">FREE · 2 KM</span></div>
+        </div>
+        <div class="body ex"><span class="tag">Example riders</span></div>
+        <div class="body wait"><div class="card mid">Rider aksar store ke bahar hi ready</div></div>
+      </div>
+
+      <div class="scene" id="s12">
+        <div class="kick">Route + ETA</div>
+        <div class="ttl"><span>Map</span> <span>software:</span> <span class="a">raasta</span> <span>aur</span> <span class="a">time</span></div>
+        <div class="map">
+          <div class="roads"></div>
+          <svg width="920" height="640" viewBox="0 0 920 640">
+            <path id="route" d="M 150 150 L 450 150 L 450 450 L 750 450" fill="none" stroke="#ffc83d" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="900" stroke-dashoffset="900" />
+          </svg>
+          <div class="lbl" style="left: 90px; top: 80px; color: var(--acc)">STORE</div>
+          <div class="dot a" style="left: 128px; top: 128px"></div>
+          <div class="lbl" style="left: 710px; top: 500px">GHAR</div>
+          <div class="dot" style="left: 728px; top: 428px"></div>
+          <div id="gps" style="position: absolute; left: 128px; top: 128px; width: 44px; height: 44px; border-radius: 22px; background: #ffffff; border: 8px solid var(--acc)"></div>
+          <div class="lbl" id="gpsl" style="left: 490px; top: 260px; font-size: 34px; color: var(--acc)">GPS DOT</div>
+        </div>
+        <div class="body eta"><span class="chip a">ETA 7 MIN</span> <span class="tag">&nbsp;example</span></div>
+      </div>
+
+      <div class="scene" id="s13">
+        <div class="kick">Data loop</div>
+        <div class="ttl"><span>Har</span> <span>order</span> <span class="a">=</span> <span class="a">naya</span> <span class="a">data</span></div>
+        <div class="body loop">
+          <div class="lring"></div>
+          <div class="nd" id="n1" style="left: 310px; top: 30px"><span class="chip a">Order</span></div>
+          <div class="nd" id="n2" style="left: 560px; top: 470px"><span class="chip">Data</span></div>
+          <div class="nd" id="n3" style="left: 60px; top: 470px"><span class="chip">Forecast</span></div>
+          <div class="nd" id="n4" style="left: 310px; top: 330px"><span class="mid" style="color: var(--acc)">Behtar ↻</span></div>
+        </div>
+      </div>
+
+      <div class="scene" id="s14">
+        <div class="kick">Asli speed</div>
+        <div class="ttl"><span>Speed</span> <span>sadak</span> <span>par</span> <span>nahi</span> <span class="a">data</span> <span class="a">mein</span></div>
+        <div class="body c1"><div class="card big">Sadak<div class="strike"></div></div></div>
+        <div class="body c2"><div class="card a big">Data</div></div>
+      </div>
+
+      <div class="scene" id="s15">
+        <div class="kick">Aapki baari</div>
+        <div class="ttl"><span>10</span> <span>minute</span> <span>mein</span> <span>sabse</span> <span>pehle</span> <span class="a">kya</span> <span class="a">mangwate</span> <span class="a">ho?</span></div>
+        <div class="body ctas">
+          <div class="btn k" id="cm">Comment karo</div>
+          <div class="btn a" id="fl">+ Follow · Unseen Engine</div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const DUR = 105.7;
+      const LEAD = 0.08;
+      const T = (t) => Math.max(0, t - LEAD);
+      const tl = gsap.timeline({ paused: true });
+      const q = (s) => document.querySelector(s);
+      const qa = (s) => Array.from(document.querySelectorAll(s));
+
+      // keeps the timeline exactly the film length
+      tl.set({}, {}, DUR);
+
+      // scenes change just after the last word of each scene's final sentence
+      const SCENES = [
+        ["#s1", 0, 7.0],
+        ["#s2", 7.02, 11.6],
+        ["#s3", 11.62, 16.33],
+        ["#s4", 16.35, 22.2],
+        ["#s5", 22.22, 29.3],
+        ["#s6", 29.32, 37.45],
+        ["#s7", 37.47, 44.7],
+        ["#s8", 44.72, 56.35],
+        ["#s9", 56.37, 64.94],
+        ["#s10", 64.96, 74.18],
+        ["#s11", 74.2, 81.02],
+        ["#s12", 81.04, 88.45],
+        ["#s13", 88.47, 94.45],
+        ["#s14", 94.47, 98.3],
+        ["#s15", 98.32, DUR + 1]
+      ];
+      const steps = qa("#steps i");
+      SCENES.forEach(([sel, a, b], i) => {
+        if (a === 0) tl.set(sel, { autoAlpha: 1 }, 0);
+        else tl.fromTo(sel, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.12, ease: "none", immediateRender: false }, a);
+        if (b < DUR) tl.to(sel, { autoAlpha: 0, duration: 0.12, ease: "none" }, b);
+        tl.set(steps[i], { backgroundColor: "#ffc83d" }, Math.max(0, a));
+      });
+
+      function rv(target, t, from) {
+        tl.fromTo(target, Object.assign({ autoAlpha: 0, y: 26 }, from || {}), { autoAlpha: 1, y: 0, x: 0, scale: 1, duration: 0.28, ease: "power2.out", immediateRender: true }, T(t));
+      }
+      function wordsAt(sel, times) {
+        qa(sel + " .ttl span").forEach((el, i) => rv(el, times[i]));
+      }
+
+      // S1 hook (0.08-6.64)
+      rv("#s1 .kick", 0.08);
+      wordsAt("#s1", [0.6, 0.84, 1.1, 1.96, 2.5]);
+      rv("#s1 .timer", 0.6, { scale: 0.8, y: 0 });
+      tl.fromTo("#s1 .ring", { rotation: 0 }, { rotation: 360, duration: 6.0, ease: "none", immediateRender: true }, T(0.6));
+      rv("#s1 .brand", 0.2);
+      rv("#s1 .hid", 4.14, { y: 40 });
+
+      // S2 roadmap (7.32-10.9)
+      rv("#s2 .kick", 7.32);
+      wordsAt("#s2", [7.32, 10.02, 10.3, 10.42, 10.52]);
+      qa("#s2 .list .card").forEach((el, i) => rv(el, 8.32 + i * 0.4, { x: -60, y: 0 }));
+
+      // S3 rider not racing (11.64-12.95), goods already near (13.6-15.9)
+      rv("#s3 .kick", 11.64);
+      wordsAt("#s3", [11.64, 12.04, 12.36, 12.56]);
+      rv("#s3 .myth", 11.8, { y: 30 });
+      tl.to("#s3 .strike", { scaleX: 1, duration: 0.25, ease: "power2.out" }, T(12.4));
+      rv("#s3 .stamp", 12.6, { scale: 1.6, y: 0 });
+      rv("#s3 .map", 13.6, { y: 40 });
+      tl.fromTo("#ln3", { rotation: -11, scaleX: 0 }, { rotation: -11, scaleX: 1, duration: 0.3, ease: "power2.out", immediateRender: true }, T(14.6));
+      rv("#near", 14.94, { y: 20 });
+
+      // S4 dark store (16.4-19.28), no customers (20.02-21.84)
+      rv("#s4 .kick", 16.4);
+      wordsAt("#s4", [16.94, 17.44, 17.66, 17.98, 18.2, 18.5]);
+      rv("#s4 .store", 16.6, { y: 40 });
+      qa("#s4 .sh").forEach((el, i) => rv(el, 17.0 + i * 0.12, { scale: 0.7, y: 0 }));
+      rv("#s4 .stamp", 20.4, { scale: 1.6, y: 0 });
+      rv("#s4 .note", 19.6, { y: 30 });
+
+      // S5 who decides (22.6-24.82), AI demand forecasting (25.64-28.94)
+      rv("#s5 .kick", 22.6);
+      wordsAt("#s5", [22.6, 23.12, 23.54, 23.96, 24.2, 24.4]);
+      rv("#s5 .src", 25.64);
+      rv("#s5 .ans", 27.52, { scale: 0.85, y: 0 });
+      rv("#s5 .ex", 28.3, { y: 30 });
+
+      // S6 model inputs (29.66-33.6), store forecast (34.2-37.1)
+      rv("#s6 .kick", 29.66);
+      wordsAt("#s6", [29.66, 29.98, 33.08, 33.4]);
+      rv("#i1", 31.12, { scale: 0.7, y: 0 });
+      rv("#i2", 31.96, { scale: 0.7, y: 0 });
+      rv("#i3", 32.7, { scale: 0.7, y: 0 });
+      rv("#s6 .ar1", 33.0);
+      rv("#s6 .model", 29.98, { scale: 0.8, y: 0 });
+      rv("#s6 .ar2", 34.2);
+      rv("#s6 .out", 34.46, { y: 30 });
+      const P = [0.85, 0.6, 0.35];
+      qa("#s6 .f").forEach((el, i) => tl.fromTo(el, { scaleX: 0 }, { scaleX: P[i], duration: 0.3, ease: "power2.out", immediateRender: true }, T(35.14 + i * 0.25)));
+      rv("#s6 .ex", 35.6);
+
+      // S7 usual method (37.84-41.2), location to server (41.86-44.4)
+      rv("#s7 .kick", 37.84);
+      wordsAt("#s7", [38.56, 38.78, 39.18, 39.8, 40.5]);
+      rv("#s7 .note", 39.8);
+      rv("#s7 .phone", 41.86, { x: -60, y: 0 });
+      rv("#s7 .flow .arrow", 42.4);
+      rv("#s7 .srv", 43.44, { x: 60, y: 0 });
+      rv("#s7 .srvl", 43.44);
+      rv("#s7 .pkt", 42.96, { scale: 0.7, y: 0 });
+      tl.to("#s7 .pkt", { x: 330, duration: 0.9, ease: "power1.inOut" }, T(43.3));
+
+      // S8 which store (45.04-48.28), delivery time per address (49.08-52.12), stock (52.76-56.02)
+      rv("#s8 .kick", 45.04);
+      wordsAt("#s8", [45.04, 47.18, 47.3, 47.46, 46.28, 46.54]);
+      rv("#s8 .map", 45.2, { y: 40 });
+      rv("#me", 46.88, { scale: 0.4, y: 0 });
+      rv("#mel", 46.88, { x: 20, y: 0 });
+      rv("#za", 47.6, { scale: 0.8, y: 0 });
+      rv("#s8 .addr", 49.68, { y: 30 });
+      rv("#s8 .ex", 50.66);
+      tl.to(["#s8 .addr", "#s8 .ex"], { autoAlpha: 0, duration: 0.12, ease: "none" }, 52.5);
+      rv("#s8 .stock", 53.02, { y: 30 });
+
+      // S9 pay, API call (56.7-59.2), lock (59.62-62.08), not sold to anyone else (62.52-64.3)
+      rv("#s9 .kick", 56.7);
+      wordsAt("#s9", [56.7, 57.56, 58.12, 58.48]);
+      rv("#s9 .code", 58.12, { x: -60, y: 0 });
+      rv("#s9 .ex1", 58.5);
+      rv("#s9 .lock", 59.62, { y: 30 });
+      tl.fromTo("#s9 .lk .sh", { y: -18 }, { y: 0, duration: 0.25, ease: "power2.in", immediateRender: true }, T(61.34));
+      rv("#s9 .other", 62.52, { y: 30 });
+
+      // S10 picker phone (64.98-67.6), shelf (68.08-71.5), scan (72.0-73.6)
+      rv("#s10 .kick", 64.98);
+      wordsAt("#s10", [65.24, 66.08, 66.42, 66.6, 66.88]);
+      rv("#s10 .ph", 65.6, { y: 40 });
+      rv("#p1", 68.08, { x: -40, y: 0 });
+      rv("#p2", 70.2, { x: -40, y: 0 });
+      rv("#p3", 70.88, { x: -40, y: 0 });
+      tl.fromTo("#s10 .beam", { autoAlpha: 0, y: 0 }, { autoAlpha: 1, y: 260, duration: 1.2, ease: "none", immediateRender: true }, T(72.0));
+      tl.to("#s10 .beam", { autoAlpha: 0, duration: 0.15, ease: "none" }, T(73.25));
+      qa("#s10 .ok").forEach((el, i) => rv(el, 72.3 + i * 0.35, { scale: 0.6, y: 0 }));
+      rv("#s10 .ex", 72.3, { y: 30 });
+
+      // S11 free rider (74.22-77.24), waiting outside (78.06-80.4)
+      rv("#s11 .kick", 74.22);
+      wordsAt("#s11", [75.24, 75.48, 76.16, 76.4]);
+      qa("#s11 .rid .card").forEach((el, i) => rv(el, 74.84 + i * 0.25, { x: -60, y: 0 }));
+      tl.to("#r2", { backgroundColor: "#ffc83d", borderColor: "#ffc83d", color: "#0a1530", duration: 0.25, ease: "none" }, T(76.4));
+      rv("#s11 .ex", 75.6);
+      rv("#s11 .wait", 78.46, { y: 30 });
+
+      // S12 route and time (81.08-84.0), GPS dot (84.58-88.14)
+      rv("#s12 .kick", 81.08);
+      wordsAt("#s12", [81.08, 81.4, 81.96, 82.44, 83.18]);
+      rv("#s12 .map", 81.2, { y: 40 });
+      tl.to("#route", { attr: { "stroke-dashoffset": 0 }, duration: 1.1, ease: "power1.inOut" }, T(81.96));
+      rv("#s12 .eta", 83.18, { scale: 0.8, y: 0 });
+      tl.to("#gps", { x: 300, duration: 1.0, ease: "none" }, T(85.28));
+      tl.to("#gps", { y: 300, duration: 1.0, ease: "none" }, T(86.28));
+      tl.to("#gps", { x: 600, duration: 1.0, ease: "none" }, T(87.28));
+      rv("#gpsl", 87.3);
+
+      // S13 order becomes data (88.78-91.1), better forecast (91.72-94.08)
+      rv("#s13 .kick", 88.78);
+      wordsAt("#s13", [88.78, 89.84, 90.12, 90.26, 90.48]);
+      rv("#s13 .lring", 89.0, { scale: 0.85, y: 0 });
+      tl.fromTo("#s13 .lring", { rotation: 0 }, { rotation: 180, duration: 5.0, ease: "none", immediateRender: false }, T(89.4));
+      rv("#n1", 89.84, { scale: 0.7, y: 0 });
+      rv("#n2", 90.26, { scale: 0.7, y: 0 });
+      rv("#n3", 92.18, { scale: 0.7, y: 0 });
+      rv("#n4", 93.3, { y: 20 });
+
+      // S14 real speed (94.8-97.7)
+      rv("#s14 .kick", 94.8);
+      wordsAt("#s14", [95.86, 96.2, 96.52, 96.72, 97.04, 97.34]);
+      rv("#s14 .c1", 96.2, { x: -60, y: 0 });
+      tl.to("#s14 .strike", { scaleX: 1, duration: 0.25, ease: "power2.out" }, T(96.72));
+      rv("#s14 .c2", 97.04, { x: 60, y: 0 });
+
+      // S15 question (98.36-101.08), comment (101.64), follow (102.7)
+      rv("#s15 .kick", 98.36);
+      wordsAt("#s15", [98.64, 98.94, 99.22, 99.46, 99.86, 100.32, 100.52, 100.98]);
+      rv("#cm", 101.64, { scale: 0.8, y: 0 });
+      rv("#fl", 102.7, { scale: 0.8, y: 0 });
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>

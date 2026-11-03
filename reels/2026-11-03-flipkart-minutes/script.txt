@@ -1,0 +1,31 @@
+Flipkart दस मिनट में लोगों के घर groceries कैसे पहुँचा देता है?
+इसके पीछे एक सिस्टम है जो दिखता नहीं।
+चलो order से delivery तक पूरा backend देखते हैं।
+Rider race नहीं लगाता।
+सामान पहले से आपके पास रखा होता है।
+आपकी colony के पास एक dark store होता है।
+वहाँ कोई customer नहीं जाता।
+उसमें क्या रखना है ये कौन तय करता है?
+Flipkart Minutes के मुताबिक AI demand forecasting।
+ऐसे models आमतौर पर पुराने orders त्योहार और मौसम पढ़ते हैं।
+फिर हर store का अंदाज़ा बनता है कि वहाँ क्या बिकेगा।
+बाकी steps quick commerce में आमतौर पर ऐसे चलते हैं।
+App खोलते ही आपकी location server पर जाती है।
+System देखता है कौन सा dark store आपके area को serve करता है।
+इसीलिए हर address पर delivery time अलग दिखता है।
+जो items आप देखते हो वो उसी store का stock है।
+Pay करते ही app एक API call भेजता है।
+Server वो packet आपके नाम lock कर देता है।
+ताकि वो किसी और को न बिके।
+अब order store में picker के phone पर पहुँचता है।
+Screen बताती है कौन सा item किस shelf पर है।
+Picker हर item scan करता है।
+उसी वक्त system पास वाला free rider चुनता है।
+Rider अक्सर store के बाहर ही खड़ा होता है।
+Map software रास्ता और पहुँचने का time निकालता है।
+Screen पर चलता dot rider के phone का जी पी एस है।
+Delivery के बाद आपका order भी data बन जाता है।
+और अगला forecast इसी से बेहतर होता है।
+यानी असली speed सड़क पर नहीं data में है।
+आप दस मिनट में सबसे पहले क्या मँगवाते हो? Comment करो।
+Follow Unseen Engine for more.
