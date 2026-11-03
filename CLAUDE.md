@@ -20,6 +20,7 @@ Two runs a day. The 7:00 AM India run publishes at 8:00 AM, and the 5:00 PM Indi
 2. Take the first open topic in `state/topics.md`. Check the facts with web search. If a claim cannot be confirmed, cut it. Never invent a number. Mark example numbers as examples.
 3. Run `scripts/new-reel.sh <slug>`, then write the script (rules below) to `script.txt` in the reel folder.
 4. Voice, through the ElevenLabs connector:
+   - Before spending any voice credits, check that the download host is reachable: `curl -sS -o /dev/null -m 20 -w '%{http_code}' https://elevenlabsusercontent.com/`. A proxy refusal (`CONNECT tunnel failed, response 403`) means the cloud environment blocks it: send a push notification saying "Add elevenlabsusercontent.com to the cloud environment's network allowlist" and stop, without generating a voice. Any HTTP code from the host (even 403 or 404 from the site itself) means it is reachable.
    - `creative_update_node` with flow `N9dFLXA6kikM3L7bz29X`, node `3ibOvBNcozQq8DIzlmu3`, the script as `prompt`, and `model_parameters` exactly `{"voice_id":"xccfcojYYGnqTTxwZEDU","voice_settings":{"speed":1.1}}` (Kanika; the call is rejected without `voice_id`, and `output_format` and `voice` are not valid parameters).
    - `creative_run_flow_nodes` with that node and `generations_count` 1.
    - `creative_get_flow_run_status` until it has a `content_url`, then download it with curl.
