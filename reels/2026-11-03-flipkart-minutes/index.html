@@ -81,7 +81,7 @@
       #s2 .card { padding: 16px 26px; }
       #s2 .card .mid { font-size: 40px; }
       #s3 .myth { top: 330px; }
-      #s3 .near { top: 1010px; }
+      #s3 .near { top: 1060px; }
       #s4 .nc { top: 330px; }
       #s4 .note { top: 1010px; }
       #s5 .src { top: 760px; }
@@ -92,8 +92,8 @@
       #s6 .ar1 { top: 350px; text-align: left; padding-left: 40px; }
       #s6 .model { top: 420px; }
       #s6 .model .card { display: inline-block; font-family: "JetBrains Mono", monospace; font-size: 40px; font-weight: 800; letter-spacing: 2px; padding: 20px 34px; }
-      #s6 .ex { top: 1100px; }
-      #s7 .note { top: 330px; }
+      #s6 .ex { top: 1100px; } #s6 .ex .tag, #s8 .ex .tag, #s12 .eta .tag, #s9 .ex1 .tag, #s5 .src .tag, #s7 .note .tag { display: inline-block; background: var(--card); padding: 8px 14px; border-radius: 10px; }
+      #s7 .note { top: 250px; }
       #s8 .addr { top: 880px; display: flex; gap: 20px; }
       #s8 .addr .card { flex: 1; padding: 20px 24px; }
       #s8 .ex { top: 1060px; }
@@ -118,7 +118,7 @@
       #s11 .rid .card { display: flex; justify-content: space-between; align-items: center; padding: 20px 30px; }
       #s11 .rid .st { font-family: "JetBrains Mono", monospace; font-size: 30px; font-weight: 800; }
       #s11 .wait { top: 1060px; }
-      #s12 .eta { top: 1080px; }
+      #s12 .eta { top: 250px; }
       #s13 .chain { top: 1000px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
       #s14 .c1 { top: 600px; }
       #s14 .c1 .card { position: relative; text-align: center; }
@@ -327,16 +327,16 @@
       const P = {
         a0: [[15, 11, 17], [1, 1.2, -2]], a1: [[9, 9.5, 16], [1, 1.2, -2]],
         b0: [[4, 34, 20], [1, 0, -4]], b1: [[-2, 33, 19], [1, 0, -4]],
-        c0: [[6, 15, 12], [3, -1.5, -5]], c1: [[4.5, 14, 11], [3, -1.5, -5]],
-        d0: [[0.4, 6.4, 6.2], [0, -0.6, -1.4]], d1: [[1.4, 5.6, 5.4], [0, -0.6, -1.4]],
+        c0: [[6, 22, 16], [3, -2.6, -9]], c1: [[4.8, 21, 15], [3, -2.6, -9]],
+        d0: [[0.7, 10.5, 10.5], [0, -0.6, -1.4]], d1: [[2.2, 9.5, 9.4], [0, -0.6, -1.4]],
         e0: [[-6, 10, 12], [0, -0.5, -2]], e1: [[-4, 9, 11], [0, -0.5, -2]],
-        f0: [[3, 9, 8], [0, 0.6, -2.6]], f1: [[2, 8.4, 7.4], [0, 0.6, -2.6]],
+        f0: [[0.6, 11, 11], [0, 2.3, -2.4]], f1: [[-0.6, 10.4, 10.2], [0, 2.3, -2.4]],
         g0: [[11, 12, 3], [5, -1, -9]], g1: [[9.5, 11, 2], [5, -1, -9]],
         h0: [[3, 64, 26], [2, 0, -3]], h1: [[-1, 60, 24], [2, 0, -3]],
         i0: [[-8, 22, 16], [3, -2, -6]], i1: [[-6, 20, 15], [3, -2, -6]],
-        j0: [[0.2, 4.6, 4.4], [0, -0.4, -1.6]], j1: [[0.8, 4.2, 3.9], [0, -0.4, -1.6]],
-        k0: [[3.6, 3.0, 9.8], [0, 0.2, 1.6]], k1: [[2.6, 2.7, 9.0], [0, 0.2, 1.6]],
-        l0: [[5, 26, 14], [1.5, -3, -5]], l1: [[2, 24, 13], [1.5, -3, -5]],
+        j0: [[0.6, 10, 9.5], [0, 0.8, -1.5]], j1: [[1.2, 9.4, 8.8], [0, 0.8, -1.5]],
+        k0: [[2.5, 7, 9], [0, 0.8, 2.0]], k1: [[1.8, 6.6, 8.4], [0, 0.8, 2.0]],
+        l0: [[3, 30, 18], [1.5, -3.8, -9]], l1: [[1, 29, 17], [1.5, -3.8, -9]],
         m0: [[0, 46, 24], [0, -2, -4]], m1: [[-3, 44, 22], [0, -2, -4]],
         n0: [[-14, 12, 16], [1, 1, -2]], n1: [[-9, 10, 17], [1, 1, -2]],
         o0: [[16, 12, 18], [1, 1, -2]], o1: [[10, 10, 18], [1, 1, -2]],
@@ -364,7 +364,7 @@
 
       const canvas = document.getElementById("gl");
       const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: true });
-      renderer.setPixelRatio(2 / 3);
+      renderer.setPixelRatio(0.6);
       renderer.setSize(W, H, false);
       renderer.outputColorSpace = THREE.SRGBColorSpace;
       renderer.toneMapping = THREE.NeutralToneMapping;
@@ -400,7 +400,7 @@
         "baseTexture",
       );
       mixPass.needsSwap = true;
-      const finalComposer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(W * pr, H * pr, { type: THREE.HalfFloatType, samples: 2 }));
+      const finalComposer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(W * pr, H * pr, { type: THREE.HalfFloatType, samples: 0 }));
       finalComposer.addPass(renderScene);
       finalComposer.addPass(mixPass);
       finalComposer.addPass(new OutputPass());
@@ -430,7 +430,7 @@
       const cols = [], picks = [], rings = [], zones = [], packets = [];
       let pickFrom = [], homes = [];
       const PICK_T = [68.08, 70.2, 70.88];
-      const FH = [3.2, 2.2, 1.3];
+      const FH = [1.6, 1.1, 0.65];
 
       function buildWorld() {
         add(scene, new THREE.PlaneGeometry(80, 100), std(COL.ground, { roughness: 0.9 })).rotation.x = -Math.PI / 2;
@@ -441,11 +441,14 @@
           add(scene, new THREE.PlaneGeometry(80, 1.3), roadMat, 0, 0.012, r).rotation.x = -Math.PI / 2;
         }
         const laneGeo = new THREE.PlaneGeometry(0.08, 0.7);
-        for (let r = -33; r <= 33; r += 6) for (let k = -48; k <= 48; k += 2) {
-          add(scene, laneGeo, laneMat, r, 0.02, k).rotation.x = -Math.PI / 2;
-        }
+        laneGeo.rotateX(-Math.PI / 2);
+        const lanes = new THREE.InstancedMesh(laneGeo, laneMat, 12 * 49);
+        const lm = new THREE.Matrix4();
+        let li = 0;
+        for (let r = -33; r <= 33; r += 6) for (let k = -48; k <= 48; k += 2) lanes.setMatrixAt(li++, lm.makeTranslation(r, 0.02, k));
+        scene.add(lanes);
         const geo = new RoundedBoxGeometry(1, 1, 1, 2, 0.08);
-        const skip = (bx, bz) => (bx === 0 && (bz === 0 || bz === -24 || bz === 24)) || (bx === 6 && bz === -6);
+        const skip = (bx, bz) => (bx === 0 && (bz === 0 || bz === 6 || bz === -24 || bz === 24)) || (bx === 6 && bz === -6);
         const list = [];
         let n = 0;
         for (let bx = -30; bx <= 30; bx += 6) for (let bz = -42; bz <= 42; bz += 6) {
@@ -498,7 +501,7 @@
         add(store, new THREE.BoxGeometry(0.9, 0.32, 0.6), std(0x3a5596), 0, 0.2, 1.1);
 
         for (let i = 0; i < 3; i++) {
-          const m = add(scene, new THREE.BoxGeometry(0.7, 1, 0.7), glowMat(COL.yel), -1.2 + i * 1.2, 1.6, -0.6);
+          const m = add(scene, new THREE.BoxGeometry(0.5, 1, 0.5), glowMat(COL.yel), -1.3 + i * 1.3, 1.6, 0.5);
           m.material.opacity = 0.92;
           glowAll(m);
           cols.push(m);
@@ -589,10 +592,10 @@
         ["pB", () => V(0, 2.4, -24), [[45.5, 56.35]]],
         ["pC", () => V(0, 2.4, 24), [[45.8, 56.35]]],
         ["pLoc", () => V(HOME.x, 2.5, HOME.z), [[42.96, 44.7], [46.88, 56.35]]],
-        ["pSrv", () => V(HOME.x, 9.5, HOME.z), [[43.6, 44.7]]],
-        ["pDoodh", () => V(-1.2, 1.6 + FH[0] + 0.3, -0.6), [[35.4, 37.45]]],
-        ["pBread", () => V(0, 1.6 + FH[1] + 0.3, -0.6), [[35.65, 37.45]]],
-        ["pChips", () => V(1.2, 1.6 + FH[2] + 0.3, -0.6), [[35.9, 37.45]]],
+        ["pSrv", () => V(HOME.x, 7, HOME.z), [[43.6, 44.7]]],
+        ["pDoodh", () => V(-1.3, 1.6 + FH[0] + 0.3, 0.5), [[35.4, 37.45]]],
+        ["pBread", () => V(0, 1.6 + FH[1] + 0.3, 0.5), [[35.65, 37.45]]],
+        ["pChips", () => V(1.3, 1.6 + FH[2] + 0.3, 0.5), [[35.9, 37.45]]],
         ["pGps", () => gps.position.clone().add(V(0, 0.5, 0)), [[87.3, 88.45]]],
         ["pRider", () => hero.position.clone().add(V(0, 1.7, 0)), [[76.4, 81.02]]],
         ["pApi", () => apiPkt.position.clone().add(V(0, 0.8, 0)), [[58.12, 59.6]]],
@@ -608,7 +611,12 @@
             continue;
           }
           tmp.copy(at()).project(camera);
-          const x = clamp(((tmp.x + 1) / 2) * W, 180, 840), y = clamp(((1 - tmp.y) / 2) * H, 300, 1480);
+          const x = ((tmp.x + 1) / 2) * W, y = ((1 - tmp.y) / 2) * H;
+          // keep pins inside the safe area and below the titles
+          if (tmp.z > 1 || y < 660 || y > 1480 || x < 200 || x > 850) {
+            el.style.opacity = "0";
+            continue;
+          }
           el.style.opacity = String(a);
           el.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) translate(-50%, -100%)`;
         }
