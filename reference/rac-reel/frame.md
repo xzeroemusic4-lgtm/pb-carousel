@@ -21,7 +21,7 @@ Series look for "Unseen Engine": navy blueprint 3D, learned from a reference ree
 
 ## Rules
 
-- Keep content between y 190 and y 1540, clear of Instagram's top bar and caption area.
+- Keep content inside x 80 to 940 and y 210 to 1500: clear of the top bar, the caption area and the right-hand like, comment and share buttons.
 - Glow is real selective bloom on emissive objects (strength 0.2, radius 0.28), never sprites.
 - Scenes change through a fog dip or one continuous camera move, only after the last word.
 - render(t) never draws inside the GSAP setter: the runtime sweeps the whole timeline on load.

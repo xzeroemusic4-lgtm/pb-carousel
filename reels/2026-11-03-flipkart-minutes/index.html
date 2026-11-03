@@ -4,6 +4,14 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=1080, height=1920" />
     <script src="vendor/gsap.min.js"></script>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "./vendor/three/build/three.module.js",
+          "three/addons/": "./vendor/three/examples/jsm/"
+        }
+      }
+    </script>
     <style>
       @font-face {
         font-family: "Space Grotesk";
@@ -20,9 +28,9 @@
       :root {
         --bg: #0a1530;
         --ink: #eef2ff;
-        --soft: #9aa8c8;
-        --line: #26386a;
-        --card: #12224a;
+        --soft: #a9b6d6;
+        --line: #2b3f74;
+        --card: rgba(18, 34, 74, 0.94);
         --acc: #ffc83d;
         --dark: #0a1530;
       }
@@ -32,157 +40,118 @@
         position: relative; width: 1080px; height: 1920px; overflow: hidden;
         background: var(--bg); color: var(--ink); font-family: "Space Grotesk", sans-serif;
       }
-      #grid {
-        position: absolute; inset: 0;
-        background-image: linear-gradient(rgba(120, 150, 220, 0.07) 2px, transparent 2px), linear-gradient(90deg, rgba(120, 150, 220, 0.07) 2px, transparent 2px);
-        background-size: 60px 60px;
-      }
+      #gl { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; z-index: 0; }
+      #shade { position: absolute; left: 0; right: 0; top: 0; height: 760px; z-index: 1; background: linear-gradient(180deg, rgba(10, 21, 48, 0.96) 0%, rgba(10, 21, 48, 0.9) 60%, rgba(10, 21, 48, 0) 100%); }
       #hdr {
-        position: absolute; left: 80px; right: 80px; top: 210px; height: 50px;
+        position: absolute; left: 80px; right: 140px; top: 210px; height: 50px; z-index: 4;
         display: flex; justify-content: space-between; align-items: center;
         font-family: "JetBrains Mono", monospace; font-size: 28px; letter-spacing: 2px; font-weight: 600;
         border-bottom: 3px solid var(--ink); padding-bottom: 14px;
       }
       #hdr b { color: var(--acc); }
-      #steps { display: flex; gap: 6px; }
-      #steps i { display: block; width: 18px; height: 8px; background: var(--line); border-radius: 4px; }
-      .scene { position: absolute; left: 80px; right: 80px; top: 320px; height: 1180px; opacity: 0; visibility: hidden; }
+      #steps { display: flex; gap: 5px; }
+      #steps i { display: block; width: 16px; height: 8px; background: var(--line); border-radius: 4px; }
+      .scene { position: absolute; left: 80px; right: 140px; top: 320px; height: 1180px; opacity: 0; visibility: hidden; z-index: 3; }
       .kick { font-family: "JetBrains Mono", monospace; font-size: 30px; letter-spacing: 4px; font-weight: 700; color: var(--acc); text-transform: uppercase; }
-      .ttl { font-size: 84px; line-height: 1.06; font-weight: 700; letter-spacing: -2px; margin-top: 18px; }
+      .ttl { font-size: 80px; line-height: 1.06; font-weight: 700; letter-spacing: -2px; margin-top: 18px; }
       .ttl span { display: inline-block; }
       .ttl .a { color: var(--acc); }
       .body { position: absolute; left: 0; right: 0; }
-      .card { background: var(--card); border: 3px solid var(--line); border-radius: 28px; padding: 34px 40px; }
+      .card { background: var(--card); border: 3px solid var(--line); border-radius: 26px; padding: 30px 36px; }
       .card.a { background: var(--acc); border-color: var(--acc); color: var(--dark); }
-      .big { font-size: 54px; font-weight: 700; line-height: 1.15; }
-      .mid { font-size: 44px; font-weight: 700; line-height: 1.2; }
+      .big { font-size: 52px; font-weight: 700; line-height: 1.15; }
+      .mid { font-size: 42px; font-weight: 700; line-height: 1.2; }
       .tag { font-family: "JetBrains Mono", monospace; font-size: 28px; letter-spacing: 2px; font-weight: 700; color: var(--soft); text-transform: uppercase; }
-      .chip { display: inline-block; font-family: "JetBrains Mono", monospace; font-size: 38px; font-weight: 700; padding: 16px 24px; border: 3px solid var(--ink); border-radius: 16px; background: var(--card); }
+      .chip { display: inline-block; font-family: "JetBrains Mono", monospace; font-size: 36px; font-weight: 700; padding: 14px 22px; border: 3px solid var(--ink); border-radius: 16px; background: var(--card); }
       .chip.a { background: var(--acc); border-color: var(--acc); color: var(--dark); }
       .btn { display: inline-block; font-size: 46px; font-weight: 700; padding: 26px 44px; border-radius: 60px; }
       .btn.k { background: var(--ink); color: var(--dark); }
       .btn.a { background: var(--acc); color: var(--dark); }
       .strike { position: absolute; left: 30px; right: 30px; top: 50%; height: 8px; background: var(--acc); transform-origin: left center; transform: scaleX(0); }
-      .stamp { position: absolute; right: 30px; top: -44px; transform: rotate(-8deg); font-family: "JetBrains Mono", monospace; font-size: 46px; font-weight: 800; color: var(--dark); background: var(--acc); padding: 10px 24px; border-radius: 12px; }
-      .row { display: flex; align-items: center; gap: 26px; }
-      .no { flex: none; width: 76px; height: 76px; border-radius: 38px; background: var(--acc); color: var(--dark); display: flex; align-items: center; justify-content: center; font-family: "JetBrains Mono", monospace; font-size: 38px; font-weight: 800; }
-      .arrow { font-family: "JetBrains Mono", monospace; font-size: 60px; font-weight: 800; color: var(--acc); text-align: center; }
-      .dot { position: absolute; width: 44px; height: 44px; border-radius: 22px; border: 6px solid var(--ink); background: var(--bg); }
-      .dot.a { background: var(--acc); border-color: var(--acc); }
-      .lbl { position: absolute; font-family: "JetBrains Mono", monospace; font-size: 28px; font-weight: 700; letter-spacing: 1px; }
-      .map { position: absolute; left: 0; right: 0; border: 3px solid var(--line); border-radius: 28px; background: var(--card); overflow: hidden; }
-      .map .roads { position: absolute; inset: 0; background-image: linear-gradient(var(--line) 4px, transparent 4px), linear-gradient(90deg, var(--line) 4px, transparent 4px); background-size: 150px 150px; opacity: 0.6; }
+      .stamp { position: absolute; right: 24px; top: -42px; transform: rotate(-8deg); font-family: "JetBrains Mono", monospace; font-size: 44px; font-weight: 800; color: var(--dark); background: var(--acc); padding: 8px 22px; border-radius: 12px; }
+      .row { display: flex; align-items: center; gap: 24px; }
+      .no { flex: none; width: 70px; height: 70px; border-radius: 35px; background: var(--acc); color: var(--dark); display: flex; align-items: center; justify-content: center; font-family: "JetBrains Mono", monospace; font-size: 36px; font-weight: 800; }
+      .arrow { font-family: "JetBrains Mono", monospace; font-size: 56px; font-weight: 800; color: var(--acc); text-align: center; }
+      .pin { position: absolute; left: 0; top: 0; z-index: 2; opacity: 0; white-space: nowrap; font-family: "JetBrains Mono", monospace; font-size: 30px; font-weight: 800; letter-spacing: 1px; padding: 8px 16px; border-radius: 12px; background: var(--card); border: 3px solid var(--ink); color: var(--ink); }
+      .pin.a { background: var(--acc); border-color: var(--acc); color: var(--dark); }
 
-      /* s1 */
-      #s1 .timer { top: 420px; display: flex; justify-content: center; }
-      #s1 .ring { width: 330px; height: 330px; border-radius: 165px; border: 18px solid var(--line); border-top-color: var(--acc); border-right-color: var(--acc); display: flex; align-items: center; justify-content: center; }
-      #s1 .ring b { font-family: "JetBrains Mono", monospace; font-size: 80px; font-weight: 800; color: var(--acc); }
-      #s1 .brand { top: 800px; text-align: center; }
-      #s1 .brand span { font-size: 48px; font-weight: 700; letter-spacing: 1px; }
-      #s1 .hid { top: 920px; }
-      /* s2 */
-      #s2 .list { top: 360px; display: flex; flex-direction: column; gap: 20px; }
-      #s2 .card { padding: 18px 30px; }
-      #s2 .card .mid { font-size: 42px; }
-      /* s3 */
-      #s3 .myth { top: 360px; }
-      #s3 .map { top: 640px; height: 520px; }
-      /* s4 */
-      #s4 .store { top: 360px; }
-      #s4 .shelves { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 24px; }
-      #s4 .sh { height: 104px; border: 3px solid var(--ink); border-radius: 14px; background: var(--bg); display: flex; align-items: center; justify-content: center; font-family: "JetBrains Mono", monospace; font-size: 30px; font-weight: 700; }
-      #s4 .store .card { position: relative; }
-      #s4 .stamp { top: -36px; }
-      #s4 .note { top: 1000px; }
-      /* s5 */
-      #s5 .src { top: 470px; }
-      #s5 .ans { top: 540px; }
-      #s5 .ans .card { font-size: 70px; font-weight: 700; line-height: 1.1; text-align: center; padding: 50px 40px; }
-      #s5 .ex { top: 860px; }
-      /* s6 */
-      #s6 .ins { top: 260px; display: flex; flex-wrap: wrap; gap: 18px; justify-content: center; }
-      #s6 .ar1 { top: 470px; }
-      #s6 .model { top: 550px; }
-      #s6 .model .card { text-align: center; font-family: "JetBrains Mono", monospace; font-size: 48px; font-weight: 800; letter-spacing: 3px; padding: 26px; }
-      #s6 .ar2 { top: 690px; }
-      #s6 .out { top: 770px; }
-      #s6 .bars { display: flex; flex-direction: column; gap: 18px; margin-top: 16px; }
-      #s6 .br { display: flex; align-items: center; gap: 22px; font-size: 38px; font-weight: 700; }
-      #s6 .br .n { width: 190px; }
-      #s6 .br .t { flex: 1; height: 50px; border: 3px solid var(--ink); border-radius: 12px; overflow: hidden; }
-      #s6 .br .f { display: block; height: 100%; width: 100%; background: var(--acc); transform-origin: left center; transform: scaleX(0); }
-      #s6 .ex { top: 1130px; }
-      /* s7 */
-      #s7 .note { top: 360px; }
-      #s7 .flow { top: 640px; display: flex; align-items: center; justify-content: space-between; }
-      #s7 .phone { width: 300px; height: 470px; border: 6px solid var(--ink); border-radius: 46px; background: var(--card); position: relative; }
-      #s7 .phone .pin { position: absolute; left: 110px; top: 150px; width: 70px; height: 70px; border-radius: 35px 35px 35px 0; transform: rotate(-45deg); background: var(--acc); }
-      #s7 .phone .t { position: absolute; left: 0; right: 0; top: 280px; text-align: center; font-size: 34px; font-weight: 700; }
-      #s7 .pkt { position: absolute; left: 300px; top: 556px; }
-      #s7 .srv { width: 300px; display: flex; flex-direction: column; gap: 14px; }
-      #s7 .srv i { display: block; height: 96px; border: 5px solid var(--ink); border-radius: 14px; background: var(--card); position: relative; }
-      #s7 .srv i::after { content: ""; position: absolute; right: 22px; top: 36px; width: 18px; height: 18px; border-radius: 9px; background: var(--acc); }
-      #s7 .srvl { position: absolute; left: auto; right: 0; top: 1130px; width: 300px; text-align: center; }
-      /* s8 */
-      #s8 .map { top: 340px; height: 470px; }
-      #s8 .zone { position: absolute; width: 300px; height: 300px; border-radius: 150px; border: 4px dashed var(--soft); }
-      #s8 .zone.a { border: 5px solid var(--acc); background: rgba(255, 200, 61, 0.12); }
-      #s8 .addr { top: 850px; display: flex; gap: 20px; }
-      #s8 .addr .card { flex: 1; padding: 22px 26px; }
-      #s8 .ex { top: 1040px; }
-      #s8 .stock { top: 850px; }
-      /* s9 */
-      #s9 .code { top: 360px; }
-      #s9 pre { font-family: "JetBrains Mono", monospace; font-size: 36px; line-height: 1.45; font-weight: 600; color: var(--ink); }
+      #s1 .brand { top: 300px; }
+      #s1 .hid { top: 900px; }
+      #s2 .list { top: 330px; display: flex; flex-direction: column; gap: 18px; }
+      #s2 .card { padding: 16px 26px; }
+      #s2 .card .mid { font-size: 40px; }
+      #s3 .myth { top: 330px; }
+      #s3 .near { top: 1010px; }
+      #s4 .nc { top: 330px; }
+      #s4 .note { top: 1010px; }
+      #s5 .src { top: 760px; }
+      #s5 .ans { top: 820px; }
+      #s5 .ans .card { font-size: 64px; font-weight: 700; line-height: 1.1; text-align: center; padding: 40px 30px; }
+      #s5 .ex { top: 1060px; }
+      #s6 .ins { top: 250px; display: flex; flex-wrap: wrap; gap: 16px; }
+      #s6 .ar1 { top: 350px; text-align: left; padding-left: 40px; }
+      #s6 .model { top: 420px; }
+      #s6 .model .card { display: inline-block; font-family: "JetBrains Mono", monospace; font-size: 40px; font-weight: 800; letter-spacing: 2px; padding: 20px 34px; }
+      #s6 .ex { top: 1100px; }
+      #s7 .note { top: 330px; }
+      #s8 .addr { top: 880px; display: flex; gap: 20px; }
+      #s8 .addr .card { flex: 1; padding: 20px 24px; }
+      #s8 .ex { top: 1060px; }
+      #s8 .stock { top: 900px; }
+      #s9 .code { top: 300px; }
+      #s9 pre { font-family: "JetBrains Mono", monospace; font-size: 34px; line-height: 1.45; font-weight: 600; color: var(--ink); }
       #s9 pre b { color: var(--acc); }
-      #s9 .ex1 { top: 700px; }
-      #s9 .lock { top: 770px; }
-      #s9 .lock .card { display: flex; align-items: center; gap: 30px; }
-      #s9 .lk { flex: none; width: 110px; height: 110px; position: relative; }
-      #s9 .lk .sh { position: absolute; left: 22px; top: 0; width: 66px; height: 66px; border: 12px solid var(--acc); border-bottom: none; border-radius: 34px 34px 0 0; }
-      #s9 .lk .bd { position: absolute; left: 0; top: 50px; width: 110px; height: 60px; border-radius: 12px; background: var(--acc); }
-      #s9 .other { top: 1010px; }
-      /* s10 */
-      #s10 .ph { top: 340px; left: 80px; right: 80px; border: 6px solid var(--ink); border-radius: 46px; background: var(--card); padding: 40px 36px; }
-      #s10 .it { display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid var(--line); padding: 22px 6px; font-size: 40px; font-weight: 700; }
-      #s10 .it .sl { font-family: "JetBrains Mono", monospace; font-size: 32px; color: var(--acc); }
-      #s10 .ok { font-family: "JetBrains Mono", monospace; font-size: 30px; font-weight: 800; color: var(--dark); background: var(--acc); padding: 6px 14px; border-radius: 10px; margin-left: 16px; }
-      #s10 .beam { position: absolute; left: 36px; right: 36px; top: 150px; height: 8px; background: var(--acc); border-radius: 4px; opacity: 0; }
-      #s10 .ex { top: 1010px; }
-      /* s11 */
-      #s11 .rid { top: 340px; display: flex; flex-direction: column; gap: 20px; }
-      #s11 .rid .card { display: flex; justify-content: space-between; align-items: center; padding: 26px 34px; }
-      #s11 .rid .st { font-family: "JetBrains Mono", monospace; font-size: 32px; font-weight: 800; }
-      #s11 .ex { top: 830px; }
-      #s11 .wait { top: 900px; }
-      /* s12 */
-      #s12 .map { top: 340px; height: 640px; }
-      #s12 svg { position: absolute; inset: 0; }
-      #s12 .eta { top: 1020px; }
-      /* s13 */
-      #s13 .loop { top: 380px; height: 700px; }
-      #s13 .lring { position: absolute; left: 160px; top: 80px; width: 600px; height: 600px; border-radius: 300px; border: 10px dashed var(--line); }
-      #s13 .nd { position: absolute; width: 300px; text-align: center; }
-      /* s14 */
-      #s14 .c1 { top: 470px; }
+      #s9 .ex1 { top: 520px; }
+      #s9 .lock { top: 880px; }
+      #s9 .lock .card { display: flex; align-items: center; gap: 28px; }
+      #s9 .lk { flex: none; width: 100px; height: 100px; position: relative; }
+      #s9 .lk .sh { position: absolute; left: 20px; top: 0; width: 60px; height: 60px; border: 11px solid var(--acc); border-bottom: none; border-radius: 30px 30px 0 0; }
+      #s9 .lk .bd { position: absolute; left: 0; top: 46px; width: 100px; height: 54px; border-radius: 12px; background: var(--acc); }
+      #s9 .other { top: 1060px; }
+      #s10 .ph { top: 290px; border: 6px solid var(--ink); border-radius: 40px; background: var(--card); padding: 30px 32px; }
+      #s10 .it { display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid var(--line); padding: 16px 4px; font-size: 38px; font-weight: 700; }
+      #s10 .it .sl { font-family: "JetBrains Mono", monospace; font-size: 30px; color: var(--acc); }
+      #s10 .ok { font-family: "JetBrains Mono", monospace; font-size: 28px; font-weight: 800; color: var(--dark); background: var(--acc); padding: 6px 12px; border-radius: 10px; margin-left: 14px; }
+      #s10 .beam { position: absolute; left: 32px; right: 32px; top: 90px; height: 8px; background: var(--acc); border-radius: 4px; opacity: 0; }
+      #s10 .ex { top: 1060px; }
+      #s11 .rid { top: 290px; display: flex; flex-direction: column; gap: 16px; }
+      #s11 .rid .card { display: flex; justify-content: space-between; align-items: center; padding: 20px 30px; }
+      #s11 .rid .st { font-family: "JetBrains Mono", monospace; font-size: 30px; font-weight: 800; }
+      #s11 .wait { top: 1060px; }
+      #s12 .eta { top: 1080px; }
+      #s13 .chain { top: 1000px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+      #s14 .c1 { top: 600px; }
       #s14 .c1 .card { position: relative; text-align: center; }
-      #s14 .c2 { top: 760px; }
+      #s14 .c2 { top: 860px; }
       #s14 .c2 .card { text-align: center; }
-      /* s15 */
-      #s15 .ctas { top: 640px; display: flex; flex-direction: column; align-items: flex-start; gap: 40px; }
+      #s15 .ctas { top: 900px; display: flex; flex-direction: column; align-items: flex-start; gap: 34px; }
     </style>
   </head>
   <body>
     <div id="root" data-composition-id="main" data-start="0" data-duration="105.7" data-width="1080" data-height="1920">
       <audio id="mix" src="assets/audio/mix.wav" data-start="0" data-duration="105.7" data-track-index="9" data-volume="1"></audio>
-      <div id="grid"></div>
+      <canvas id="gl" width="1080" height="1920" data-layout-allow-overflow=""></canvas>
+      <div id="shade"></div>
       <div id="hdr"><span>UNSEEN ENGINE · <b>MINUTES</b></span><span id="steps"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
+
+      <div class="pin a" id="pStore">DARK STORE</div>
+      <div class="pin" id="pHome">GHAR</div>
+      <div class="pin" id="pB">STORE B</div>
+      <div class="pin" id="pC">STORE C</div>
+      <div class="pin a" id="pA">STORE A</div>
+      <div class="pin" id="pLoc">AAPKI LOCATION</div>
+      <div class="pin a" id="pSrv">SERVER</div>
+      <div class="pin" id="pDoodh">DOODH</div>
+      <div class="pin" id="pBread">BREAD</div>
+      <div class="pin" id="pChips">CHIPS</div>
+      <div class="pin a" id="pGps">GPS DOT</div>
+      <div class="pin a" id="pRider">RIDER 2</div>
+      <div class="pin" id="pApi">API CALL</div>
 
       <div class="scene" id="s1">
         <div class="kick">10 minute delivery</div>
         <div class="ttl"><span>10</span> <span>minute</span> <span>mein</span> <span class="a">groceries</span> <span>kaise?</span></div>
-        <div class="body timer"><div class="ring"><b>10:00</b></div></div>
-        <div class="body brand"><span>Flipkart Minutes</span></div>
+        <div class="body brand"><span class="chip">Flipkart Minutes</span></div>
         <div class="body hid"><div class="card a big">Peeche ek system hai jo dikhta nahi</div></div>
       </div>
 
@@ -190,7 +159,7 @@
         <div class="kick">Order se delivery tak</div>
         <div class="ttl"><span>Poora</span> <span class="a">backend</span> <span>step</span> <span>by</span> <span>step</span></div>
         <div class="body list">
-          <div class="card row"><span class="no">1</span><span class="mid">Forecast: store mein kya rakhein</span></div>
+          <div class="card row"><span class="no">1</span><span class="mid">Forecast: kya rakhein</span></div>
           <div class="card row"><span class="no">2</span><span class="mid">Location: kaunsa store</span></div>
           <div class="card row"><span class="no">3</span><span class="mid">API call: stock lock</span></div>
           <div class="card row"><span class="no">4</span><span class="mid">Picker: scan aur pack</span></div>
@@ -203,31 +172,13 @@
         <div class="kick">Speed ka raaz</div>
         <div class="ttl"><span>Rider</span> <span>race</span> <span>nahi</span> <span>lagata</span></div>
         <div class="body myth"><div class="card big" style="position: relative; text-align: center">Full speed race?<div class="strike"></div><div class="stamp">NAHI</div></div></div>
-        <div class="map">
-          <div class="roads"></div>
-          <div class="dot" id="hm" style="left: 220px; top: 280px"></div>
-          <div class="lbl" style="left: 170px; top: 350px">GHAR</div>
-          <div class="dot a" id="ds" style="left: 620px; top: 210px"></div>
-          <div class="lbl" style="left: 540px; top: 140px; color: var(--acc)">DARK STORE</div>
-          <div id="ln3" style="position: absolute; left: 262px; top: 292px; width: 362px; height: 6px; background: var(--acc); transform-origin: left center; "></div>
-          <div class="lbl" id="near" style="left: 40px; top: 440px; font-size: 34px">SAAMAAN PEHLE SE PAAS</div>
-        </div>
+        <div class="body near"><div class="card a mid">Saamaan pehle se paas</div></div>
       </div>
 
       <div class="scene" id="s4">
         <div class="kick">Dark store</div>
         <div class="ttl"><span>Colony</span> <span>ke</span> <span>paas</span> <span>ek</span> <span class="a">dark</span> <span class="a">store</span></div>
-        <div class="body store">
-          <div class="card">
-            <div class="tag">Example items</div>
-            <div class="shelves">
-              <div class="sh">Doodh</div><div class="sh">Bread</div><div class="sh">Atta</div>
-              <div class="sh">Anda</div><div class="sh">Chawal</div><div class="sh">Biscuit</div>
-              <div class="sh">Sabzi</div><div class="sh">Chai patti</div><div class="sh">Sabun</div>
-            </div>
-            <div class="stamp">NO CUSTOMERS</div>
-          </div>
-        </div>
+        <div class="body nc"><span class="chip a">NO CUSTOMERS</span></div>
         <div class="body note"><div class="card mid">Sirf orders pack hote hain</div></div>
       </div>
 
@@ -244,46 +195,19 @@
         <div class="ttl"><span>Model</span> <span>kya</span> <span class="a">padhta</span> <span>hai?</span></div>
         <div class="body ins"><span class="chip" id="i1">Purane orders</span><span class="chip" id="i2">Tyohaar</span><span class="chip" id="i3">Mausam</span></div>
         <div class="body arrow ar1">↓</div>
-        <div class="body model"><div class="card a">MODEL</div></div>
-        <div class="body arrow ar2">↓</div>
-        <div class="body out">
-          <div class="tag">Har store ka andaaza</div>
-          <div class="bars">
-            <div class="br"><span class="n">Doodh</span><span class="t"><span class="f"></span></span></div>
-            <div class="br"><span class="n">Bread</span><span class="t"><span class="f"></span></span></div>
-            <div class="br"><span class="n">Chips</span><span class="t"><span class="f"></span></span></div>
-          </div>
-        </div>
+        <div class="body model"><div class="card a">MODEL → store ka andaaza</div></div>
         <div class="body ex"><span class="tag">Example bars · samjhane ke liye</span></div>
       </div>
 
       <div class="scene" id="s7">
         <div class="kick">Aage ke steps</div>
         <div class="ttl"><span>Quick</span> <span>commerce</span> <span>ka</span> <span class="a">usual</span> <span class="a">tareeka</span></div>
-        <div class="body note" style="top: 400px"><span class="tag">Ye steps aamtaur par aise chalte hain</span></div>
-        <div class="body flow">
-          <div class="phone"><div class="pin"></div><div class="t">App khola</div></div>
-          <div class="arrow">→</div>
-          <div class="srv"><i></i><i></i><i></i><i></i></div>
-        </div>
-        <div class="pkt"><span class="chip a">location</span></div>
-        <div class="body srvl"><span class="tag">Server</span></div>
+        <div class="body note"><span class="tag">Ye steps aamtaur par aise chalte hain</span></div>
       </div>
 
       <div class="scene" id="s8">
         <div class="kick">Kaunsa store?</div>
         <div class="ttl"><span>Aapka</span> <span>area</span> <span class="a">→</span> <span>ek</span> <span class="a">dark</span> <span class="a">store</span></div>
-        <div class="map">
-          <div class="roads"></div>
-          <div class="zone" style="left: 20px; top: 80px"></div>
-          <div class="zone a" id="za" style="left: 310px; top: 120px"></div>
-          <div class="zone" style="left: 600px; top: 60px"></div>
-          <div class="dot" style="left: 148px; top: 208px"></div>
-          <div class="dot a" style="left: 438px; top: 248px"></div>
-          <div class="dot" style="left: 728px; top: 188px"></div>
-          <div class="dot" id="me" style="left: 520px; top: 330px; width: 30px; height: 30px; border-width: 5px"></div>
-          <div class="lbl" id="mel" style="left: 560px; top: 330px">AAP</div>
-        </div>
         <div class="body addr">
           <div class="card"><div class="tag">Address 1</div><div class="mid">9 min</div></div>
           <div class="card"><div class="tag">Address 2</div><div class="mid">14 min</div></div>
@@ -296,10 +220,10 @@
         <div class="kick">API call</div>
         <div class="ttl"><span>Pay</span> <span class="a">→</span> <span>API</span> <span>call</span></div>
         <div class="body code"><div class="card"><pre>POST <b>/order</b>
-{ store: "B", items: ["doodh"] }</pre></div></div>
+{ store: "A", items: ["doodh"] }</pre></div></div>
         <div class="body ex1"><span class="tag">Example request</span></div>
         <div class="body lock"><div class="card"><div class="lk"><div class="sh"></div><div class="bd"></div></div><div class="mid">Packet aapke naam LOCK</div></div></div>
-        <div class="body other"><div class="card a mid">Taaki wahi packet kisi aur ko na bike</div></div>
+        <div class="body other"><div class="card a mid">Taaki kisi aur ko na bike</div></div>
       </div>
 
       <div class="scene" id="s10">
@@ -307,9 +231,9 @@
         <div class="ttl"><span>Order</span> <span class="a">picker</span> <span>ke</span> <span>phone</span> <span>par</span></div>
         <div class="body ph">
           <div class="tag">Pick list · example</div>
-          <div class="it" id="p1"><span>Doodh</span><span><span class="sl">Shelf A3</span><span class="ok">SCAN ✓</span></span></div>
-          <div class="it" id="p2"><span>Bread</span><span><span class="sl">Shelf B1</span><span class="ok">SCAN ✓</span></span></div>
-          <div class="it" id="p3"><span>Chips</span><span><span class="sl">Shelf C4</span><span class="ok">SCAN ✓</span></span></div>
+          <div class="it" id="p1"><span>Doodh</span><span><span class="sl">A3</span><span class="ok">SCAN ✓</span></span></div>
+          <div class="it" id="p2"><span>Bread</span><span><span class="sl">B1</span><span class="ok">SCAN ✓</span></span></div>
+          <div class="it" id="p3"><span>Chips</span><span><span class="sl">C4</span><span class="ok">SCAN ✓</span></span></div>
           <div class="beam"></div>
         </div>
         <div class="body ex"><div class="card mid">Scan = sahi item</div></div>
@@ -320,41 +244,22 @@
         <div class="ttl"><span>Paas</span> <span>wala</span> <span class="a">free</span> <span class="a">rider</span></div>
         <div class="body rid">
           <div class="card" id="r1"><span class="mid">Rider 1</span><span class="st" style="color: var(--soft)">BUSY</span></div>
-          <div class="card" id="r2"><span class="mid">Rider 2</span><span class="st">FREE · 0.2 KM</span></div>
-          <div class="card" id="r3"><span class="mid">Rider 3</span><span class="st">FREE · 2 KM</span></div>
+          <div class="card" id="r2"><span class="mid">Rider 2</span><span class="st">FREE · PAAS</span></div>
+          <div class="card" id="r3"><span class="mid">Rider 3</span><span class="st">FREE · DOOR</span></div>
         </div>
-        <div class="body ex"><span class="tag">Example riders</span></div>
-        <div class="body wait"><div class="card mid">Rider aksar store ke bahar hi ready</div></div>
+        <div class="body wait"><div class="card mid">Rider aksar store ke bahar ready</div></div>
       </div>
 
       <div class="scene" id="s12">
         <div class="kick">Route + ETA</div>
         <div class="ttl"><span>Map</span> <span>software:</span> <span class="a">raasta</span> <span>aur</span> <span class="a">time</span></div>
-        <div class="map">
-          <div class="roads"></div>
-          <svg width="920" height="640" viewBox="0 0 920 640">
-            <path id="route" d="M 150 150 L 450 150 L 450 450 L 750 450" fill="none" stroke="#ffc83d" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="900" stroke-dashoffset="900" />
-          </svg>
-          <div class="lbl" style="left: 90px; top: 80px; color: var(--acc)">STORE</div>
-          <div class="dot a" style="left: 128px; top: 128px"></div>
-          <div class="lbl" style="left: 710px; top: 500px">GHAR</div>
-          <div class="dot" style="left: 728px; top: 428px"></div>
-          <div id="gps" style="position: absolute; left: 128px; top: 128px; width: 44px; height: 44px; border-radius: 22px; background: #ffffff; border: 8px solid var(--acc)"></div>
-          <div class="lbl" id="gpsl" style="left: 490px; top: 260px; font-size: 34px; color: var(--acc)">GPS DOT</div>
-        </div>
         <div class="body eta"><span class="chip a">ETA 7 MIN</span> <span class="tag">&nbsp;example</span></div>
       </div>
 
       <div class="scene" id="s13">
         <div class="kick">Data loop</div>
         <div class="ttl"><span>Har</span> <span>order</span> <span class="a">=</span> <span class="a">naya</span> <span class="a">data</span></div>
-        <div class="body loop">
-          <div class="lring"></div>
-          <div class="nd" id="n1" style="left: 310px; top: 30px"><span class="chip a">Order</span></div>
-          <div class="nd" id="n2" style="left: 560px; top: 470px"><span class="chip">Data</span></div>
-          <div class="nd" id="n3" style="left: 60px; top: 470px"><span class="chip">Forecast</span></div>
-          <div class="nd" id="n4" style="left: 310px; top: 330px"><span class="mid" style="color: var(--acc)">Behtar ↻</span></div>
-        </div>
+        <div class="body chain"><span class="chip a" id="n1">Order</span><span class="arrow" id="n1a">→</span><span class="chip" id="n2">Data</span><span class="arrow" id="n2a">→</span><span class="chip" id="n3">Behtar forecast</span></div>
       </div>
 
       <div class="scene" id="s14">
@@ -374,190 +279,583 @@
       </div>
     </div>
 
-    <script>
-      const DUR = 105.7;
-      const LEAD = 0.08;
-      const T = (t) => Math.max(0, t - LEAD);
-      const tl = gsap.timeline({ paused: true });
-      const q = (s) => document.querySelector(s);
-      const qa = (s) => Array.from(document.querySelectorAll(s));
+    <script type="module">
+      import * as THREE from "three";
+      import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+      import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
+      import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
+      import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
+      import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
+      import { ShaderPass } from "three/addons/postprocessing/ShaderPass.js";
+      import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
 
-      // keeps the timeline exactly the film length
-      tl.set({}, {}, DUR);
+      // A navy miniature city: dark store A in the middle, stores B and C up and down the map,
+      // the viewer's home one block away, riders, a route and data packets. Camera keyframes per scene.
+      const DUR = 105.7, W = 1080, H = 1920, FOV = 38, BLOOM = 1, BG = 0x0a1530;
+      const easeCache = {};
+      const ease = (n) => easeCache[n] || (easeCache[n] = gsap.parseEase(n));
+      const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+      function track(keys) {
+        const es = keys.map((k) => ease(k[2] || "none"));
+        return (t) => {
+          if (t <= keys[0][0]) return keys[0][1];
+          for (let i = 1; i < keys.length; i++) {
+            if (t <= keys[i][0]) {
+              const [t0, v0] = keys[i - 1];
+              const [t1, v1] = keys[i];
+              return v0 + (v1 - v0) * es[i]((t - t0) / (t1 - t0));
+            }
+          }
+          return keys[keys.length - 1][1];
+        };
+      }
+      function seg(t, t0, t1, v0, v1, e = "none") {
+        if (t <= t0) return v0;
+        if (t >= t1) return v1;
+        return v0 + (v1 - v0) * ease(e)((t - t0) / (t1 - t0));
+      }
+      const win = (t, a, b) => t >= a && t < b;
+      const hash = (i, k = 1) => {
+        const x = Math.sin(i * 127.1 + k * 311.7) * 43758.5453;
+        return x - Math.floor(x);
+      };
+      const V = (x, y, z) => new THREE.Vector3(x, y, z);
 
-      // scenes change just after the last word of each scene's final sentence
-      const SCENES = [
-        ["#s1", 0, 7.0],
-        ["#s2", 7.02, 11.6],
-        ["#s3", 11.62, 16.33],
-        ["#s4", 16.35, 22.2],
-        ["#s5", 22.22, 29.3],
-        ["#s6", 29.32, 37.45],
-        ["#s7", 37.47, 44.7],
-        ["#s8", 44.72, 56.35],
-        ["#s9", 56.37, 64.94],
-        ["#s10", 64.96, 74.18],
-        ["#s11", 74.2, 81.02],
-        ["#s12", 81.04, 88.45],
-        ["#s13", 88.47, 94.45],
-        ["#s14", 94.47, 98.3],
-        ["#s15", 98.32, DUR + 1]
+      const STORE_A = V(0, 0, 0), STORE_B = V(0, 0, -24), STORE_C = V(0, 0, 24), HOME = V(6, 0, -7.4);
+
+      // camera poses: [position, look-at]
+      const P = {
+        a0: [[15, 11, 17], [1, 1.2, -2]], a1: [[9, 9.5, 16], [1, 1.2, -2]],
+        b0: [[4, 34, 20], [1, 0, -4]], b1: [[-2, 33, 19], [1, 0, -4]],
+        c0: [[6, 15, 12], [3, -1.5, -5]], c1: [[4.5, 14, 11], [3, -1.5, -5]],
+        d0: [[0.4, 6.4, 6.2], [0, -0.6, -1.4]], d1: [[1.4, 5.6, 5.4], [0, -0.6, -1.4]],
+        e0: [[-6, 10, 12], [0, -0.5, -2]], e1: [[-4, 9, 11], [0, -0.5, -2]],
+        f0: [[3, 9, 8], [0, 0.6, -2.6]], f1: [[2, 8.4, 7.4], [0, 0.6, -2.6]],
+        g0: [[11, 12, 3], [5, -1, -9]], g1: [[9.5, 11, 2], [5, -1, -9]],
+        h0: [[3, 64, 26], [2, 0, -3]], h1: [[-1, 60, 24], [2, 0, -3]],
+        i0: [[-8, 22, 16], [3, -2, -6]], i1: [[-6, 20, 15], [3, -2, -6]],
+        j0: [[0.2, 4.6, 4.4], [0, -0.4, -1.6]], j1: [[0.8, 4.2, 3.9], [0, -0.4, -1.6]],
+        k0: [[3.6, 3.0, 9.8], [0, 0.2, 1.6]], k1: [[2.6, 2.7, 9.0], [0, 0.2, 1.6]],
+        l0: [[5, 26, 14], [1.5, -3, -5]], l1: [[2, 24, 13], [1.5, -3, -5]],
+        m0: [[0, 46, 24], [0, -2, -4]], m1: [[-3, 44, 22], [0, -2, -4]],
+        n0: [[-14, 12, 16], [1, 1, -2]], n1: [[-9, 10, 17], [1, 1, -2]],
+        o0: [[16, 12, 18], [1, 1, -2]], o1: [[10, 10, 18], [1, 1, -2]],
+      };
+      const CAM = [
+        [0, P.a0], [7.0, P.a1, "sine.inOut"],
+        [7.0001, P.b0], [11.6, P.b1, "sine.inOut"],
+        [11.6201, P.c0], [16.33, P.c1, "sine.inOut"],
+        [16.3501, P.d0], [22.2, P.d1, "sine.inOut"],
+        [22.2201, P.e0], [28.9, P.e1, "sine.inOut"], [29.9, P.f0, "power2.inOut"], [37.45, P.f1, "sine.inOut"],
+        [37.4701, P.g0], [44.7, P.g1, "sine.inOut"],
+        [44.7201, P.h0], [56.35, P.h1, "sine.inOut"],
+        [56.3701, P.i0], [64.94, P.i1, "sine.inOut"],
+        [64.9601, P.j0], [74.18, P.j1, "sine.inOut"],
+        [74.2001, P.k0], [81.02, P.k1, "sine.inOut"],
+        [81.0401, P.l0], [88.45, P.l1, "sine.inOut"],
+        [88.4701, P.m0], [94.45, P.m1, "sine.inOut"],
+        [94.4701, P.n0], [98.3, P.n1, "sine.inOut"],
+        [98.3201, P.o0], [DUR, P.o1, "sine.out"],
       ];
-      const steps = qa("#steps i");
-      SCENES.forEach(([sel, a, b], i) => {
-        if (a === 0) tl.set(sel, { autoAlpha: 1 }, 0);
-        else tl.fromTo(sel, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.12, ease: "none", immediateRender: false }, a);
-        if (b < DUR) tl.to(sel, { autoAlpha: 0, duration: 0.12, ease: "none" }, b);
-        tl.set(steps[i], { backgroundColor: "#ffc83d" }, Math.max(0, a));
-      });
+      const camP = [0, 1, 2].map((i) => track(CAM.map((k) => [k[0], k[1][0][i], k[2]])));
+      const camL = [0, 1, 2].map((i) => track(CAM.map((k) => [k[0], k[1][1][i], k[2]])));
+      const DIPS = [7.0, 11.62, 16.35, 22.22, 37.47, 44.72, 56.37, 64.96, 74.2, 81.04, 88.47, 94.47, 98.32];
+      const dip = (t) => DIPS.reduce((m, c) => Math.max(m, Math.abs(t - c) < 0.2 ? Math.sin((Math.PI * (t - c + 0.2)) / 0.4) : 0), 0);
 
-      function rv(target, t, from) {
-        tl.fromTo(target, Object.assign({ autoAlpha: 0, y: 26 }, from || {}), { autoAlpha: 1, y: 0, x: 0, scale: 1, duration: 0.28, ease: "power2.out", immediateRender: true }, T(t));
+      const canvas = document.getElementById("gl");
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: true });
+      renderer.setPixelRatio(2 / 3);
+      renderer.setSize(W, H, false);
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      renderer.toneMapping = THREE.NeutralToneMapping;
+      const scene = new THREE.Scene();
+      const bgColor = new THREE.Color(BG);
+      scene.background = bgColor;
+      scene.fog = new THREE.Fog(BG, 40, 150);
+      scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), 0.04).texture;
+      scene.environmentIntensity = 0.32;
+      const camera = new THREE.PerspectiveCamera(FOV, W / H, 0.1, 260);
+      camera.layers.enable(BLOOM);
+      scene.add(camera);
+      const lookAt = new THREE.Vector3();
+      scene.add(new THREE.HemisphereLight(0xa8c8ff, 0x0a1f3a, 1.2));
+      const key = new THREE.DirectionalLight(0xffffff, 1.6);
+      key.position.set(10, 24, 14);
+      scene.add(key);
+      const rim = new THREE.DirectionalLight(0x6fa0ff, 1.2);
+      rim.position.set(-12, 9, -14);
+      scene.add(rim);
+      const pr = renderer.getPixelRatio();
+      const renderScene = new RenderPass(scene, camera);
+      const bloomComposer = new EffectComposer(renderer);
+      bloomComposer.renderToScreen = false;
+      bloomComposer.addPass(renderScene);
+      bloomComposer.addPass(new UnrealBloomPass(new THREE.Vector2(W * pr, H * pr), 0.2, 0.28, 0.0));
+      const mixPass = new ShaderPass(
+        new THREE.ShaderMaterial({
+          uniforms: { baseTexture: { value: null }, bloomTexture: { value: bloomComposer.renderTarget2.texture } },
+          vertexShader: "varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }",
+          fragmentShader: "uniform sampler2D baseTexture; uniform sampler2D bloomTexture; varying vec2 vUv; void main(){ gl_FragColor = texture2D(baseTexture, vUv) + texture2D(bloomTexture, vUv); }",
+        }),
+        "baseTexture",
+      );
+      mixPass.needsSwap = true;
+      const finalComposer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(W * pr, H * pr, { type: THREE.HalfFloatType, samples: 2 }));
+      finalComposer.addPass(renderScene);
+      finalComposer.addPass(mixPass);
+      finalComposer.addPass(new OutputPass());
+      const glowAll = (obj) => obj.traverse((o) => o.layers.enable(BLOOM));
+      const blackMat = new THREE.MeshBasicMaterial({ color: 0x000000, fog: false });
+      const bloomLayer = new THREE.Layers();
+      bloomLayer.set(BLOOM);
+      const saved = new Map();
+      function darken(o) {
+        if (!o.visible || o.layers.test(bloomLayer)) return;
+        if (o.isMesh) {
+          saved.set(o, o.material);
+          o.material = blackMat;
+        }
       }
-      function wordsAt(sel, times) {
-        qa(sel + " .ttl span").forEach((el, i) => rv(el, times[i]));
+      const std = (color, o = {}) => new THREE.MeshStandardMaterial({ color, roughness: 0.6, metalness: 0.05, ...o });
+      const glowMat = (color) => new THREE.MeshBasicMaterial({ color, transparent: true, depthWrite: false });
+      const add = (parent, geo, mat, x = 0, y = 0, z = 0) => {
+        const m = new THREE.Mesh(geo, mat);
+        m.position.set(x, y, z);
+        parent.add(m);
+        return m;
+      };
+      const COL = { base: 0x2f63b0, pale: 0x7fa9d8, ice: 0xbfd8ff, yel: 0xf7c948, ground: 0x0e1c3c, road: 0x1d3466 };
+
+      let route, routePath, routeIdx, hero, gps, gpsRing, beam, zoneA, homeGlow, apiPkt;
+      const cols = [], picks = [], rings = [], zones = [], packets = [];
+      let pickFrom = [], homes = [];
+      const PICK_T = [68.08, 70.2, 70.88];
+      const FH = [3.2, 2.2, 1.3];
+
+      function buildWorld() {
+        add(scene, new THREE.PlaneGeometry(80, 100), std(COL.ground, { roughness: 0.9 })).rotation.x = -Math.PI / 2;
+        const roadMat = std(COL.road, { roughness: 0.85 });
+        const laneMat = std(0x3a5596, { roughness: 0.7 });
+        for (let r = -33; r <= 33; r += 6) {
+          add(scene, new THREE.PlaneGeometry(1.3, 100), roadMat, r, 0.01, 0).rotation.x = -Math.PI / 2;
+          add(scene, new THREE.PlaneGeometry(80, 1.3), roadMat, 0, 0.012, r).rotation.x = -Math.PI / 2;
+        }
+        const laneGeo = new THREE.PlaneGeometry(0.08, 0.7);
+        for (let r = -33; r <= 33; r += 6) for (let k = -48; k <= 48; k += 2) {
+          add(scene, laneGeo, laneMat, r, 0.02, k).rotation.x = -Math.PI / 2;
+        }
+        const geo = new RoundedBoxGeometry(1, 1, 1, 2, 0.08);
+        const skip = (bx, bz) => (bx === 0 && (bz === 0 || bz === -24 || bz === 24)) || (bx === 6 && bz === -6);
+        const list = [];
+        let n = 0;
+        for (let bx = -30; bx <= 30; bx += 6) for (let bz = -42; bz <= 42; bz += 6) {
+          if (skip(bx, bz)) continue;
+          for (const [ox, oz] of [[-1.2, -1.2], [1.2, -1.2], [-1.2, 1.2], [1.2, 1.2]]) {
+            n++;
+            const h = 0.5 + 2.4 * hash(n, 3) * hash(n, 7) + 0.4 * hash(n, 9);
+            list.push([bx + ox, bz + oz, 1.7 + 0.4 * hash(n, 5), h, 1.7 + 0.4 * hash(n, 11), hash(n, 13)]);
+          }
+        }
+        const inst = new THREE.InstancedMesh(geo, std(0xffffff, { roughness: 0.55 }), list.length);
+        const m4 = new THREE.Matrix4(), c = new THREE.Color();
+        list.forEach(([x, z, sx, h, sz, k], i) => {
+          m4.compose(V(x, h / 2, z), new THREE.Quaternion(), V(sx, h, sz));
+          inst.setMatrixAt(i, m4);
+          inst.setColorAt(i, c.set(k < 0.55 ? COL.base : k < 0.85 ? 0x2a5296 : COL.pale));
+        });
+        scene.add(inst);
+
+        // dark store A: cut-away (no roof, low front wall), shelves, products, glowing sign
+        const store = new THREE.Group();
+        scene.add(store);
+        const wallM = std(0x24447e, { roughness: 0.5 });
+        add(store, new THREE.BoxGeometry(4.6, 0.08, 3.4), std(0x16284e), 0, 0.04, 0);
+        add(store, new THREE.BoxGeometry(4.6, 1.5, 0.14), wallM, 0, 0.75, -1.7);
+        add(store, new THREE.BoxGeometry(0.14, 1.5, 3.4), wallM, -2.3, 0.75, 0);
+        add(store, new THREE.BoxGeometry(0.14, 1.5, 3.4), wallM, 2.3, 0.75, 0);
+        add(store, new THREE.BoxGeometry(1.7, 0.4, 0.14), wallM, -1.45, 0.2, 1.7);
+        add(store, new THREE.BoxGeometry(1.7, 0.4, 0.14), wallM, 1.45, 0.2, 1.7);
+        glowAll(add(store, new THREE.BoxGeometry(2.6, 0.32, 0.1), glowMat(COL.yel), 0, 1.72, -1.66));
+        const shelfM = std(0x0f1f40, { metalness: 0.4, roughness: 0.4 });
+        const prodCols = [COL.pale, COL.ice, 0x3f7fd6, 0xe8eefc, 0x5f8fd0];
+        const prodGeo = new THREE.BoxGeometry(0.26, 0.3, 0.26);
+        let pn = 0;
+        for (let r = 0; r < 3; r++) {
+          const z = -1.05 + r * 0.95;
+          add(store, new THREE.BoxGeometry(3.4, 1.0, 0.36), shelfM, 0, 0.55, z);
+          for (let lv = 0; lv < 2; lv++) for (let i = 0; i < 9; i++) {
+            pn++;
+            const x = -1.5 + i * 0.375, y = 0.22 + lv * 0.46;
+            const isPick = (r === 0 && lv === 1 && i === 2) || (r === 1 && lv === 1 && i === 6) || (r === 2 && lv === 0 && i === 4);
+            const b = add(store, prodGeo, isPick ? glowMat(COL.yel) : std(prodCols[Math.floor(hash(pn, 2) * 5)], { roughness: 0.45 }), x, y + 0.27, z + 0.2);
+            if (isPick) {
+              glowAll(b);
+              picks.push(b);
+            }
+          }
+        }
+        pickFrom = picks.map((p) => p.position.clone());
+        add(store, new THREE.BoxGeometry(0.9, 0.32, 0.6), std(0x3a5596), 0, 0.2, 1.1);
+
+        for (let i = 0; i < 3; i++) {
+          const m = add(scene, new THREE.BoxGeometry(0.7, 1, 0.7), glowMat(COL.yel), -1.2 + i * 1.2, 1.6, -0.6);
+          m.material.opacity = 0.92;
+          glowAll(m);
+          cols.push(m);
+        }
+
+        for (const s of [STORE_B, STORE_C]) {
+          add(scene, new RoundedBoxGeometry(4.2, 1.5, 3.0, 2, 0.1), std(0x24447e), s.x, 0.75, s.z);
+          glowAll(add(scene, new THREE.BoxGeometry(2.4, 0.3, 0.1), glowMat(COL.yel), s.x, 1.7, s.z + 1.56));
+        }
+
+        const house = (x, z, col) => {
+          const g = new THREE.Group();
+          g.position.set(x, 0, z);
+          add(g, new RoundedBoxGeometry(1.6, 1.1, 1.6, 2, 0.06), std(col), 0, 0.55, 0);
+          add(g, new THREE.ConeGeometry(1.3, 0.8, 4), std(0xdfe8ff), 0, 1.5, 0).rotation.y = Math.PI / 4;
+          scene.add(g);
+          return g;
+        };
+        house(HOME.x, HOME.z, COL.pale);
+        homeGlow = add(scene, new THREE.RingGeometry(1.25, 1.5, 48), glowMat(COL.yel), HOME.x, 0.05, HOME.z);
+        homeGlow.rotation.x = -Math.PI / 2;
+        glowAll(homeGlow);
+        house(7.6, -4.2, 0x5a86c8);
+        homes = [V(-9, 0, -9), V(-15, 0, 3), V(9, 0, 9), V(-3, 0, 15), V(15, 0, -3), V(HOME.x, 0, HOME.z)];
+
+        routePath = new THREE.CurvePath();
+        const pts = [V(0, 0.12, 1.8), V(0, 0.12, 3), V(-3, 0.12, 3), V(-3, 0.12, -9), V(6, 0.12, -9), V(6, 0.12, -8.3)];
+        for (let i = 1; i < pts.length; i++) routePath.add(new THREE.LineCurve3(pts[i - 1], pts[i]));
+        const tube = new THREE.TubeGeometry(routePath, 400, 0.13, 8, false);
+        routeIdx = tube.index.count;
+        route = add(scene, tube, glowMat(COL.yel));
+        glowAll(route);
+
+        const scooter = (x, z, bodyCol) => {
+          const g = new THREE.Group();
+          g.position.set(x, 0, z);
+          add(g, new RoundedBoxGeometry(0.42, 0.34, 1.0, 2, 0.08), std(bodyCol, { metalness: 0.3, roughness: 0.4 }), 0, 0.42, 0);
+          const wheelG = new THREE.CylinderGeometry(0.17, 0.17, 0.1, 20);
+          for (const wz of [-0.36, 0.36]) add(g, wheelG, std(0x0b1226, { roughness: 0.8 }), 0, 0.17, wz).rotation.z = Math.PI / 2;
+          add(g, new RoundedBoxGeometry(0.44, 0.4, 0.4, 2, 0.05), std(COL.yel, { roughness: 0.5 }), 0, 0.8, -0.28);
+          add(g, new THREE.CapsuleGeometry(0.13, 0.3, 4, 10), std(0xdfe8ff), 0, 0.88, 0.12);
+          add(g, new THREE.SphereGeometry(0.13, 16, 12), std(0xdfe8ff), 0, 1.22, 0.14);
+          scene.add(g);
+          return g;
+        };
+        scooter(-1.4, 3.3, 0x46598a);
+        hero = scooter(0, 3.3, COL.pale);
+        scooter(1.4, 3.3, COL.pale);
+        gps = add(scene, new THREE.SphereGeometry(0.28, 20, 16), glowMat(0xffffff), 0, 2.0, 3.3);
+        glowAll(gps);
+        gpsRing = add(scene, new THREE.RingGeometry(0.5, 0.65, 40), glowMat(COL.yel), 0, 0.05, 3.3);
+        gpsRing.rotation.x = -Math.PI / 2;
+        glowAll(gpsRing);
+
+        for (let k = 0; k < 3; k++) {
+          const r = add(scene, new THREE.RingGeometry(0.9, 1.05, 56), glowMat(COL.yel), HOME.x, 0.06, HOME.z);
+          r.rotation.x = -Math.PI / 2;
+          glowAll(r);
+          rings.push(r);
+        }
+        beam = add(scene, new THREE.CylinderGeometry(0.09, 0.09, 1, 12), glowMat(COL.yel), HOME.x, 0, HOME.z);
+        glowAll(beam);
+
+        for (const s of [STORE_A, STORE_B, STORE_C]) {
+          const disc = add(scene, new THREE.CircleGeometry(11, 64), glowMat(COL.base), s.x, 0.04, s.z);
+          disc.rotation.x = -Math.PI / 2;
+          const edge = add(scene, new THREE.RingGeometry(10.7, 11, 96), glowMat(0xbfd8ff), s.x, 0.05, s.z);
+          edge.rotation.x = -Math.PI / 2;
+          zones.push([disc, edge]);
+        }
+        zoneA = add(scene, new THREE.RingGeometry(10.6, 11.1, 96), glowMat(COL.yel), 0, 0.06, 0);
+        zoneA.rotation.x = -Math.PI / 2;
+        glowAll(zoneA);
+
+        for (let k = 0; k < 12; k++) {
+          const p = add(scene, new THREE.SphereGeometry(0.3, 16, 12), glowMat(k % 2 ? COL.yel : 0xffffff));
+          glowAll(p);
+          packets.push(p);
+        }
+        apiPkt = add(scene, new THREE.BoxGeometry(0.5, 0.5, 0.5), glowMat(COL.yel));
+        glowAll(apiPkt);
       }
 
-      // S1 hook (0.08-6.64)
-      rv("#s1 .kick", 0.08);
-      wordsAt("#s1", [0.6, 0.84, 1.1, 1.96, 2.5]);
-      rv("#s1 .timer", 0.6, { scale: 0.8, y: 0 });
-      tl.fromTo("#s1 .ring", { rotation: 0 }, { rotation: 360, duration: 6.0, ease: "none", immediateRender: true }, T(0.6));
-      rv("#s1 .brand", 0.2);
-      rv("#s1 .hid", 4.14, { y: 40 });
+      const PIN_DEFS = [
+        ["pStore", () => V(0, 2.3, 0), [[13.6, 16.33], [16.6, 22.2], [81.6, 88.45]]],
+        ["pHome", () => V(HOME.x, 2.4, HOME.z), [[14.0, 16.33], [81.6, 88.45]]],
+        ["pA", () => V(0, 2.4, 0), [[45.2, 56.35]]],
+        ["pB", () => V(0, 2.4, -24), [[45.5, 56.35]]],
+        ["pC", () => V(0, 2.4, 24), [[45.8, 56.35]]],
+        ["pLoc", () => V(HOME.x, 2.5, HOME.z), [[42.96, 44.7], [46.88, 56.35]]],
+        ["pSrv", () => V(HOME.x, 9.5, HOME.z), [[43.6, 44.7]]],
+        ["pDoodh", () => V(-1.2, 1.6 + FH[0] + 0.3, -0.6), [[35.4, 37.45]]],
+        ["pBread", () => V(0, 1.6 + FH[1] + 0.3, -0.6), [[35.65, 37.45]]],
+        ["pChips", () => V(1.2, 1.6 + FH[2] + 0.3, -0.6), [[35.9, 37.45]]],
+        ["pGps", () => gps.position.clone().add(V(0, 0.5, 0)), [[87.3, 88.45]]],
+        ["pRider", () => hero.position.clone().add(V(0, 1.7, 0)), [[76.4, 81.02]]],
+        ["pApi", () => apiPkt.position.clone().add(V(0, 0.8, 0)), [[58.12, 59.6]]],
+      ];
+      let PINS = [];
+      const tmp = new THREE.Vector3();
+      function pins(t) {
+        for (const [el, at, wins] of PINS) {
+          let a = 0;
+          for (const [w0, w1] of wins) if (t >= w0 - 0.08 && t < w1) a = Math.max(a, clamp((t - (w0 - 0.08)) / 0.2, 0, 1) * clamp((w1 - t) / 0.12, 0, 1));
+          if (a <= 0) {
+            el.style.opacity = "0";
+            continue;
+          }
+          tmp.copy(at()).project(camera);
+          const x = clamp(((tmp.x + 1) / 2) * W, 180, 840), y = clamp(((1 - tmp.y) / 2) * H, 300, 1480);
+          el.style.opacity = String(a);
+          el.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) translate(-50%, -100%)`;
+        }
+      }
 
-      // S2 roadmap (7.32-10.9)
-      rv("#s2 .kick", 7.32);
-      wordsAt("#s2", [7.32, 10.02, 10.3, 10.42, 10.52]);
-      qa("#s2 .list .card").forEach((el, i) => rv(el, 8.32 + i * 0.4, { x: -60, y: 0 }));
+      let drawn = -1, built = false;
+      function render(t) {
+        if (!built || t === drawn) return;
+        drawn = t;
+        camera.position.set(camP[0](t), camP[1](t), camP[2](t));
+        lookAt.set(camL[0](t), camL[1](t), camL[2](t));
+        camera.lookAt(lookAt);
+        camera.updateMatrixWorld();
+        const d = dip(t);
+        scene.fog.near = 40 * (1 - d) + 0.1 * d;
+        scene.fog.far = 150 * (1 - d) + 0.5 * d;
 
-      // S3 rider not racing (11.64-12.95), goods already near (13.6-15.9)
-      rv("#s3 .kick", 11.64);
-      wordsAt("#s3", [11.64, 12.04, 12.36, 12.56]);
-      rv("#s3 .myth", 11.8, { y: 30 });
-      tl.to("#s3 .strike", { scaleX: 1, duration: 0.25, ease: "power2.out" }, T(12.4));
-      rv("#s3 .stamp", 12.6, { scale: 1.6, y: 0 });
-      rv("#s3 .map", 13.6, { y: 40 });
-      tl.fromTo("#ln3", { rotation: -11, scaleX: 0 }, { rotation: -11, scaleX: 1, duration: 0.3, ease: "power2.out", immediateRender: true }, T(14.6));
-      rv("#near", 14.94, { y: 20 });
+        let rv = 0;
+        if (win(t, 14.6, 16.33)) rv = seg(t, 14.6, 15.3, 0, 1, "power2.out");
+        if (win(t, 81.96, 88.45)) rv = seg(t, 81.96, 83.1, 0, 1, "power1.inOut");
+        route.visible = rv > 0;
+        route.geometry.setDrawRange(0, Math.floor((rv * routeIdx) / 48) * 48);
 
-      // S4 dark store (16.4-19.28), no customers (20.02-21.84)
-      rv("#s4 .kick", 16.4);
-      wordsAt("#s4", [16.94, 17.44, 17.66, 17.98, 18.2, 18.5]);
-      rv("#s4 .store", 16.6, { y: 40 });
-      qa("#s4 .sh").forEach((el, i) => rv(el, 17.0 + i * 0.12, { scale: 0.7, y: 0 }));
-      rv("#s4 .stamp", 20.4, { scale: 1.6, y: 0 });
-      rv("#s4 .note", 19.6, { y: 30 });
+        cols.forEach((c, i) => {
+          const k = win(t, 29.32, 37.45) ? seg(t, 35.14 + i * 0.25, 35.44 + i * 0.25, 0, 1, "power2.out") : 0;
+          c.visible = k > 0;
+          c.scale.y = Math.max(0.001, k * FH[i]);
+          c.position.y = 1.6 + (k * FH[i]) / 2;
+        });
 
-      // S5 who decides (22.6-24.82), AI demand forecasting (25.64-28.94)
-      rv("#s5 .kick", 22.6);
-      wordsAt("#s5", [22.6, 23.12, 23.54, 23.96, 24.2, 24.4]);
-      rv("#s5 .src", 25.64);
-      rv("#s5 .ans", 27.52, { scale: 0.85, y: 0 });
-      rv("#s5 .ex", 28.3, { y: 30 });
+        picks.forEach((b, i) => {
+          const u = seg(t, PICK_T[i], PICK_T[i] + 0.7, 0, 1, "power2.inOut");
+          b.position.lerpVectors(pickFrom[i], V(-0.25 + i * 0.25, 0.52, 1.1), u);
+          b.position.y += Math.sin(Math.PI * u) * 0.9;
+        });
 
-      // S6 model inputs (29.66-33.6), store forecast (34.2-37.1)
-      rv("#s6 .kick", 29.66);
-      wordsAt("#s6", [29.66, 29.98, 33.08, 33.4]);
-      rv("#i1", 31.12, { scale: 0.7, y: 0 });
-      rv("#i2", 31.96, { scale: 0.7, y: 0 });
-      rv("#i3", 32.7, { scale: 0.7, y: 0 });
-      rv("#s6 .ar1", 33.0);
-      rv("#s6 .model", 29.98, { scale: 0.8, y: 0 });
-      rv("#s6 .ar2", 34.2);
-      rv("#s6 .out", 34.46, { y: 30 });
-      const P = [0.85, 0.6, 0.35];
-      qa("#s6 .f").forEach((el, i) => tl.fromTo(el, { scaleX: 0 }, { scaleX: P[i], duration: 0.3, ease: "power2.out", immediateRender: true }, T(35.14 + i * 0.25)));
-      rv("#s6 .ex", 35.6);
+        const lit = t >= 76.4 && t < 98.32;
+        hero.children[0].material.color.set(lit ? COL.yel : COL.pale);
+        if (win(t, 85.28, 98.32)) {
+          const u = seg(t, 85.28, 88.1, 0, 1, "sine.inOut");
+          const p = routePath.getPointAt(u), tg = routePath.getTangentAt(u);
+          hero.position.set(p.x, 0, p.z);
+          hero.rotation.y = Math.atan2(tg.x, tg.z);
+        } else {
+          hero.position.set(0, 0, 3.3);
+          hero.rotation.y = 0;
+        }
+        const gpsOn = win(t, 84.58, 88.45);
+        gps.visible = gpsRing.visible = gpsOn;
+        gps.position.set(hero.position.x, 2.0 + 0.12 * Math.sin(t * 6), hero.position.z);
+        gpsRing.position.set(hero.position.x, 0.05, hero.position.z);
+        gpsRing.scale.setScalar(1 + 0.25 * Math.sin(t * 5));
 
-      // S7 usual method (37.84-41.2), location to server (41.86-44.4)
-      rv("#s7 .kick", 37.84);
-      wordsAt("#s7", [38.56, 38.78, 39.18, 39.8, 40.5]);
-      rv("#s7 .note", 39.8);
-      rv("#s7 .phone", 41.86, { x: -60, y: 0 });
-      rv("#s7 .flow .arrow", 42.4);
-      rv("#s7 .srv", 43.44, { x: 60, y: 0 });
-      rv("#s7 .srvl", 43.44);
-      rv("#s7 .pkt", 42.96, { scale: 0.7, y: 0 });
-      tl.to("#s7 .pkt", { x: 330, duration: 0.9, ease: "power1.inOut" }, T(43.3));
+        rings.forEach((r, k) => {
+          const u = win(t, 42.96, 44.7) ? (t - 42.96 - k * 0.45) / 1.3 : -1;
+          r.visible = u > 0 && u < 1;
+          r.scale.setScalar(1 + 5 * Math.max(0, u));
+          r.material.opacity = 1 - clamp(u, 0, 1);
+        });
+        const bh = win(t, 43.44, 44.7) ? seg(t, 43.44, 43.9, 0, 9, "power2.out") : 0;
+        beam.visible = bh > 0;
+        beam.scale.y = Math.max(0.001, bh);
+        beam.position.y = bh / 2;
+        homeGlow.visible = win(t, 14.0, 16.33) || win(t, 41.86, 56.35) || win(t, 81.6, 88.45);
 
-      // S8 which store (45.04-48.28), delivery time per address (49.08-52.12), stock (52.76-56.02)
-      rv("#s8 .kick", 45.04);
-      wordsAt("#s8", [45.04, 47.18, 47.3, 47.46, 46.28, 46.54]);
-      rv("#s8 .map", 45.2, { y: 40 });
-      rv("#me", 46.88, { scale: 0.4, y: 0 });
-      rv("#mel", 46.88, { x: 20, y: 0 });
-      rv("#za", 47.6, { scale: 0.8, y: 0 });
-      rv("#s8 .addr", 49.68, { y: 30 });
-      rv("#s8 .ex", 50.66);
-      tl.to(["#s8 .addr", "#s8 .ex"], { autoAlpha: 0, duration: 0.12, ease: "none" }, 52.5);
-      rv("#s8 .stock", 53.02, { y: 30 });
+        const zo = win(t, 44.72, 56.35) ? seg(t, 45.2, 45.6, 0, 1) : 0;
+        zones.forEach(([disc, edge]) => {
+          disc.visible = edge.visible = zo > 0;
+          disc.material.opacity = 0.18 * zo;
+          edge.material.opacity = 0.7 * zo;
+        });
+        const za = win(t, 44.72, 56.35) ? seg(t, 47.6, 47.9, 0, 1) : 0;
+        zoneA.visible = za > 0;
+        zoneA.material.opacity = za;
 
-      // S9 pay, API call (56.7-59.2), lock (59.62-62.08), not sold to anyone else (62.52-64.3)
-      rv("#s9 .kick", 56.7);
-      wordsAt("#s9", [56.7, 57.56, 58.12, 58.48]);
-      rv("#s9 .code", 58.12, { x: -60, y: 0 });
-      rv("#s9 .ex1", 58.5);
-      rv("#s9 .lock", 59.62, { y: 30 });
-      tl.fromTo("#s9 .lk .sh", { y: -18 }, { y: 0, duration: 0.25, ease: "power2.in", immediateRender: true }, T(61.34));
-      rv("#s9 .other", 62.52, { y: 30 });
+        const ua = win(t, 58.12, 59.6) ? seg(t, 58.12, 59.2, 0, 1, "power1.inOut") : -1;
+        apiPkt.visible = ua >= 0;
+        if (ua >= 0) {
+          apiPkt.position.lerpVectors(V(HOME.x, 1.6, HOME.z), V(0, 1.6, 0), ua);
+          apiPkt.position.y += Math.sin(Math.PI * ua) * 3;
+          apiPkt.rotation.set(t * 2, t * 3, 0);
+        }
 
-      // S10 picker phone (64.98-67.6), shelf (68.08-71.5), scan (72.0-73.6)
-      rv("#s10 .kick", 64.98);
-      wordsAt("#s10", [65.24, 66.08, 66.42, 66.6, 66.88]);
-      rv("#s10 .ph", 65.6, { y: 40 });
-      rv("#p1", 68.08, { x: -40, y: 0 });
-      rv("#p2", 70.2, { x: -40, y: 0 });
-      rv("#p3", 70.88, { x: -40, y: 0 });
-      tl.fromTo("#s10 .beam", { autoAlpha: 0, y: 0 }, { autoAlpha: 1, y: 260, duration: 1.2, ease: "none", immediateRender: true }, T(72.0));
-      tl.to("#s10 .beam", { autoAlpha: 0, duration: 0.15, ease: "none" }, T(73.25));
-      qa("#s10 .ok").forEach((el, i) => rv(el, 72.3 + i * 0.35, { scale: 0.6, y: 0 }));
-      rv("#s10 .ex", 72.3, { y: 30 });
+        packets.forEach((p, k) => {
+          const on = win(t, 88.9, 94.45);
+          p.visible = on;
+          if (!on) return;
+          const h = homes[k % homes.length];
+          const u = ((((t - 88.9) / 1.6 + k / 12) % 1) + 1) % 1;
+          p.position.lerpVectors(V(h.x, 1.2, h.z), V(0, 1.6, 0), u);
+          p.position.y += Math.sin(Math.PI * u) * 2.5;
+        });
 
-      // S11 free rider (74.22-77.24), waiting outside (78.06-80.4)
-      rv("#s11 .kick", 74.22);
-      wordsAt("#s11", [75.24, 75.48, 76.16, 76.4]);
-      qa("#s11 .rid .card").forEach((el, i) => rv(el, 74.84 + i * 0.25, { x: -60, y: 0 }));
-      tl.to("#r2", { backgroundColor: "#ffc83d", borderColor: "#ffc83d", color: "#0a1530", duration: 0.25, ease: "none" }, T(76.4));
-      rv("#s11 .ex", 75.6);
-      rv("#s11 .wait", 78.46, { y: 30 });
+        pins(t);
 
-      // S12 route and time (81.08-84.0), GPS dot (84.58-88.14)
-      rv("#s12 .kick", 81.08);
-      wordsAt("#s12", [81.08, 81.4, 81.96, 82.44, 83.18]);
-      rv("#s12 .map", 81.2, { y: 40 });
-      tl.to("#route", { attr: { "stroke-dashoffset": 0 }, duration: 1.1, ease: "power1.inOut" }, T(81.96));
-      rv("#s12 .eta", 83.18, { scale: 0.8, y: 0 });
-      tl.to("#gps", { x: 300, duration: 1.0, ease: "none" }, T(85.28));
-      tl.to("#gps", { y: 300, duration: 1.0, ease: "none" }, T(86.28));
-      tl.to("#gps", { x: 600, duration: 1.0, ease: "none" }, T(87.28));
-      rv("#gpsl", 87.3);
+        scene.background = null;
+        renderer.setClearColor(0x000000, 1);
+        scene.traverse(darken);
+        bloomComposer.render();
+        saved.forEach((m, o) => (o.material = m));
+        saved.clear();
+        scene.background = bgColor;
+        finalComposer.render();
+      }
 
-      // S13 order becomes data (88.78-91.1), better forecast (91.72-94.08)
-      rv("#s13 .kick", 88.78);
-      wordsAt("#s13", [88.78, 89.84, 90.12, 90.26, 90.48]);
-      rv("#s13 .lring", 89.0, { scale: 0.85, y: 0 });
-      tl.fromTo("#s13 .lring", { rotation: 0 }, { rotation: 180, duration: 5.0, ease: "none", immediateRender: false }, T(89.4));
-      rv("#n1", 89.84, { scale: 0.7, y: 0 });
-      rv("#n2", 90.26, { scale: 0.7, y: 0 });
-      rv("#n3", 92.18, { scale: 0.7, y: 0 });
-      rv("#n4", 93.3, { y: 20 });
+      function buildTimeline() {
+        const LEAD = 0.08;
+        const T = (t) => Math.max(0, t - LEAD);
+        const tl = gsap.timeline({ paused: true });
+        const qa = (s) => Array.from(document.querySelectorAll(s));
+        tl.set({}, {}, DUR);
+        const SCENES = [
+          ["#s1", 0, 7.0], ["#s2", 7.02, 11.6], ["#s3", 11.62, 16.33], ["#s4", 16.35, 22.2], ["#s5", 22.22, 29.3],
+          ["#s6", 29.32, 37.45], ["#s7", 37.47, 44.7], ["#s8", 44.72, 56.35], ["#s9", 56.37, 64.94], ["#s10", 64.96, 74.18],
+          ["#s11", 74.2, 81.02], ["#s12", 81.04, 88.45], ["#s13", 88.47, 94.45], ["#s14", 94.47, 98.3], ["#s15", 98.32, DUR + 1],
+        ];
+        const steps = qa("#steps i");
+        SCENES.forEach(([sel, a, b], i) => {
+          if (a === 0) tl.set(sel, { autoAlpha: 1 }, 0);
+          else tl.fromTo(sel, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.12, ease: "none", immediateRender: false }, a);
+          if (b < DUR) tl.to(sel, { autoAlpha: 0, duration: 0.12, ease: "none" }, b);
+          tl.set(steps[i], { backgroundColor: "#ffc83d" }, Math.max(0, a));
+        });
+        const rv = (target, t, from) =>
+          tl.fromTo(target, Object.assign({ autoAlpha: 0, y: 26 }, from || {}), { autoAlpha: 1, y: 0, x: 0, scale: 1, duration: 0.28, ease: "power2.out", immediateRender: true }, T(t));
+        const wordsAt = (sel, times) => qa(sel + " .ttl span").forEach((el, i) => rv(el, times[i]));
 
-      // S14 real speed (94.8-97.7)
-      rv("#s14 .kick", 94.8);
-      wordsAt("#s14", [95.86, 96.2, 96.52, 96.72, 97.04, 97.34]);
-      rv("#s14 .c1", 96.2, { x: -60, y: 0 });
-      tl.to("#s14 .strike", { scaleX: 1, duration: 0.25, ease: "power2.out" }, T(96.72));
-      rv("#s14 .c2", 97.04, { x: 60, y: 0 });
+        rv("#s1 .kick", 0.08);
+        wordsAt("#s1", [0.6, 0.84, 1.1, 1.96, 2.5]);
+        rv("#s1 .brand", 0.3);
+        rv("#s1 .hid", 4.14, { y: 40 });
 
-      // S15 question (98.36-101.08), comment (101.64), follow (102.7)
-      rv("#s15 .kick", 98.36);
-      wordsAt("#s15", [98.64, 98.94, 99.22, 99.46, 99.86, 100.32, 100.52, 100.98]);
-      rv("#cm", 101.64, { scale: 0.8, y: 0 });
-      rv("#fl", 102.7, { scale: 0.8, y: 0 });
+        rv("#s2 .kick", 7.32);
+        wordsAt("#s2", [7.32, 10.02, 10.3, 10.42, 10.52]);
+        qa("#s2 .list .card").forEach((el, i) => rv(el, 8.32 + i * 0.4, { x: -60, y: 0 }));
 
-      window.__timelines = window.__timelines || {};
-      window.__timelines["main"] = tl;
+        rv("#s3 .kick", 11.64);
+        wordsAt("#s3", [11.64, 12.04, 12.36, 12.56]);
+        rv("#s3 .myth", 11.8, { y: 30 });
+        tl.to("#s3 .strike", { scaleX: 1, duration: 0.25, ease: "power2.out" }, T(12.4));
+        rv("#s3 .stamp", 12.6, { scale: 1.6, y: 0 });
+        rv("#s3 .near", 14.94, { y: 30 });
+
+        rv("#s4 .kick", 16.4);
+        wordsAt("#s4", [16.94, 17.44, 17.66, 17.98, 18.2, 18.5]);
+        rv("#s4 .nc", 20.4, { scale: 1.4, y: 0 });
+        rv("#s4 .note", 19.6, { y: 30 });
+
+        rv("#s5 .kick", 22.6);
+        wordsAt("#s5", [22.6, 23.12, 23.54, 23.96, 24.2, 24.4]);
+        rv("#s5 .src", 25.64);
+        rv("#s5 .ans", 27.52, { scale: 0.85, y: 0 });
+        rv("#s5 .ex", 28.3, { y: 30 });
+
+        rv("#s6 .kick", 29.66);
+        wordsAt("#s6", [29.66, 29.98, 33.08, 33.4]);
+        rv("#i1", 31.12, { scale: 0.7, y: 0 });
+        rv("#i2", 31.96, { scale: 0.7, y: 0 });
+        rv("#i3", 32.7, { scale: 0.7, y: 0 });
+        rv("#s6 .ar1", 33.0);
+        rv("#s6 .model", 34.2, { scale: 0.8, y: 0 });
+        rv("#s6 .ex", 35.6);
+
+        rv("#s7 .kick", 37.84);
+        wordsAt("#s7", [38.56, 38.78, 39.18, 39.8, 40.5]);
+        rv("#s7 .note", 39.8);
+
+        rv("#s8 .kick", 45.04);
+        wordsAt("#s8", [45.04, 47.18, 47.3, 47.46, 46.28, 46.54]);
+        rv("#s8 .addr", 49.68, { y: 30 });
+        rv("#s8 .ex", 50.66);
+        tl.to(["#s8 .addr", "#s8 .ex"], { autoAlpha: 0, duration: 0.12, ease: "none" }, 52.5);
+        rv("#s8 .stock", 53.02, { y: 30 });
+
+        rv("#s9 .kick", 56.7);
+        wordsAt("#s9", [56.7, 57.56, 58.12, 58.48]);
+        rv("#s9 .code", 57.56, { x: -60, y: 0 });
+        rv("#s9 .ex1", 58.5);
+        rv("#s9 .lock", 59.62, { y: 30 });
+        tl.fromTo("#s9 .lk .sh", { y: -18 }, { y: 0, duration: 0.25, ease: "power2.in", immediateRender: true }, T(61.34));
+        rv("#s9 .other", 62.52, { y: 30 });
+
+        rv("#s10 .kick", 64.98);
+        wordsAt("#s10", [65.24, 66.08, 66.42, 66.6, 66.88]);
+        rv("#s10 .ph", 65.6, { y: 40 });
+        rv("#p1", 68.08, { x: -40, y: 0 });
+        rv("#p2", 70.2, { x: -40, y: 0 });
+        rv("#p3", 70.88, { x: -40, y: 0 });
+        tl.fromTo("#s10 .beam", { autoAlpha: 0, y: 0 }, { autoAlpha: 1, y: 200, duration: 1.0, ease: "none", immediateRender: true }, T(72.0));
+        tl.to("#s10 .beam", { autoAlpha: 0, duration: 0.15, ease: "none" }, T(73.05));
+        qa("#s10 .ok").forEach((el, i) => rv(el, 72.3 + i * 0.3, { scale: 0.6, y: 0 }));
+        rv("#s10 .ex", 72.3, { y: 30 });
+
+        rv("#s11 .kick", 74.22);
+        wordsAt("#s11", [75.24, 75.48, 76.16, 76.4]);
+        qa("#s11 .rid .card").forEach((el, i) => rv(el, 74.84 + i * 0.25, { x: -60, y: 0 }));
+        tl.to("#r2", { backgroundColor: "#ffc83d", borderColor: "#ffc83d", color: "#0a1530", duration: 0.25, ease: "none" }, T(76.4));
+        rv("#s11 .wait", 78.46, { y: 30 });
+
+        rv("#s12 .kick", 81.08);
+        wordsAt("#s12", [81.08, 81.4, 81.96, 82.44, 83.18]);
+        rv("#s12 .eta", 83.18, { scale: 0.8, y: 0 });
+
+        rv("#s13 .kick", 88.78);
+        wordsAt("#s13", [88.78, 89.84, 90.12, 90.26, 90.48]);
+        rv("#n1", 89.84, { scale: 0.7, y: 0 });
+        rv("#n1a", 90.1);
+        rv("#n2", 90.26, { scale: 0.7, y: 0 });
+        rv("#n2a", 91.8);
+        rv("#n3", 92.18, { scale: 0.7, y: 0 });
+
+        rv("#s14 .kick", 94.8);
+        wordsAt("#s14", [95.86, 96.2, 96.52, 96.72, 97.04, 97.34]);
+        rv("#s14 .c1", 96.2, { x: -60, y: 0 });
+        tl.to("#s14 .strike", { scaleX: 1, duration: 0.25, ease: "power2.out" }, T(96.72));
+        rv("#s14 .c2", 97.04, { x: 60, y: 0 });
+
+        rv("#s15 .kick", 98.36);
+        wordsAt("#s15", [98.64, 98.94, 99.22, 99.46, 99.86, 100.32, 100.52, 100.98]);
+        rv("#cm", 101.64, { scale: 0.8, y: 0 });
+        rv("#fl", 102.7, { scale: 0.8, y: 0 });
+
+        // driver: playback draws from onUpdate, capture seeks draw from the hf-seek listener
+        const clock = { t: 0 };
+        tl.to(clock, { t: DUR, duration: DUR, ease: "none", onUpdate: () => render(clock.t) }, 0);
+        return tl;
+      }
+
+      async function build() {
+        try {
+          await Promise.all(['500 40px "Space Grotesk"', '700 40px "Space Grotesk"', '700 40px "JetBrains Mono"'].map((f) => document.fonts.load(f, "Aa")));
+        } catch (e) {
+          /* fallback fonts */
+        }
+        buildWorld();
+        PINS = PIN_DEFS.map(([id, at, wins]) => [document.getElementById(id), at, wins]);
+        built = true;
+        const tl = buildTimeline();
+        render(0);
+        window.__timelines = window.__timelines || {};
+        window.__timelines["main"] = tl;
+        if (window.__hfForceTimelineRebind) window.__hfForceTimelineRebind();
+      }
+      window.addEventListener("hf-seek", (e) => render(e.detail.time));
+      window.__hf = window.__hf || {};
+      window.__hf.buildReady = window.__hf.buildReady || {};
+      window.__hf.buildReady["minutes"] = build();
     </script>
   </body>
 </html>
