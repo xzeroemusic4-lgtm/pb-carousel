@@ -4,7 +4,6 @@ The series is "Unseen Engine": how the systems Indians use every day really work
 
 ## Open
 
-- LLMs: how they actually work
 - Claude: how it writes an answer
 - Netflix: how it decides what to show you
 - MacBook battery: why it lasts so much longer than a Windows laptop, and what the on-device AI chip does
@@ -39,3 +38,4 @@ The series is "Unseen Engine": how the systems Indians use every day really work
 - YouTube: how the suggestion system picks your next video (2 Nov 2026)
 - RAC: why two strangers share one berth (2 Nov 2026)
 - ChatGPT: what it is and how it answers, step by step (2 Nov 2026)
+- LLMs: how they actually work (3 Nov 2026)
