@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="vendor/gsap.min.js"></script>
+    <style>
+      @font-face {
+        font-family: "Space Grotesk";
+        src: url("assets/fonts/space-grotesk.woff2") format("woff2");
+        font-weight: 300 700;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: "JetBrains Mono";
+        src: url("assets/fonts/jetbrains-mono.woff2") format("woff2");
+        font-weight: 100 800;
+        font-style: normal;
+      }
+      :root {
+        --bg: #ffffff;
+        --ink: #0b0b0b;
+        --soft: #6b6b6b;
+        --line: #e3e3e3;
+        --card: #f5f5f4;
+        --acc: #4f46e5;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--bg); }
+      #root {
+        position: relative; width: 1080px; height: 1920px; overflow: hidden;
+        background: var(--bg); color: var(--ink); font-family: "Space Grotesk", sans-serif;
+      }
+      #hdr {
+        position: absolute; left: 80px; right: 80px; top: 210px; height: 50px;
+        display: flex; justify-content: space-between; align-items: center;
+        font-family: "JetBrains Mono", monospace; font-size: 28px; letter-spacing: 3px; font-weight: 600;
+        border-bottom: 3px solid var(--ink); padding-bottom: 14px;
+      }
+      #hdr b { color: var(--acc); }
+      #steps { display: flex; gap: 10px; }
+      #steps i { display: block; width: 34px; height: 8px; background: var(--line); border-radius: 4px; }
+      .scene { position: absolute; left: 80px; right: 80px; top: 320px; height: 1180px; opacity: 0; visibility: hidden; }
+      .kick { font-family: "JetBrains Mono", monospace; font-size: 30px; letter-spacing: 4px; font-weight: 700; color: var(--acc); text-transform: uppercase; }
+      .ttl { font-size: 92px; line-height: 1.04; font-weight: 700; letter-spacing: -2px; margin-top: 18px; }
+      .ttl span { display: inline-block; }
+      .ttl .a { color: var(--acc); }
+      .sub { font-size: 40px; color: var(--soft); margin-top: 22px; font-weight: 500; }
+      .card { background: var(--card); border: 3px solid var(--ink); border-radius: 28px; padding: 36px 40px; }
+      .bub { display: inline-block; font-size: 52px; font-weight: 600; padding: 26px 34px; border-radius: 30px; }
+      .bub.u { background: var(--ink); color: #fff; border-bottom-right-radius: 8px; }
+      .tag { font-family: "JetBrains Mono", monospace; font-size: 28px; letter-spacing: 2px; font-weight: 700; color: var(--soft); }
+      .chip { display: inline-block; font-family: "JetBrains Mono", monospace; font-size: 44px; font-weight: 700; padding: 18px 26px; border: 3px solid var(--ink); border-radius: 16px; background: #fff; }
+      .chip.a { background: var(--acc); border-color: var(--acc); color: #fff; }
+      .btn { display: inline-block; font-size: 46px; font-weight: 700; padding: 26px 44px; border-radius: 60px; }
+      .btn.k { background: var(--ink); color: #fff; }
+      .btn.a { background: var(--acc); color: #fff; }
+      .strike { position: absolute; left: 30px; right: 30px; top: 50%; height: 8px; background: var(--ink); transform-origin: left center; transform: scaleX(0); }
+      .stamp { position: absolute; right: 40px; top: -46px; transform: rotate(-8deg); font-family: "JetBrains Mono", monospace; font-size: 52px; font-weight: 800; color: #fff; background: var(--acc); padding: 10px 26px; border-radius: 12px; }
+
+      /* s1 */
+      #s1 .myth { position: absolute; left: 0; right: 0; top: 640px; }
+      #s1 .myth .card { position: relative; font-size: 54px; font-weight: 700; text-align: center; }
+      /* s2 */
+      #s2 .grid { position: absolute; left: 0; right: 0; top: 420px; display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; }
+      #s2 .cell { height: 100px; border: 4px solid var(--ink); border-radius: 14px; background: var(--card); display: flex; align-items: center; justify-content: center; font-family: "JetBrains Mono", monospace; font-size: 34px; font-weight: 700; }
+      #s2 .ex { position: absolute; left: 0; top: 1010px; }
+      #s2 .pm { position: absolute; left: 0; top: 1075px; }
+      /* s3 */
+      #s3 .steps3 { position: absolute; left: 0; right: 0; top: 400px; display: flex; flex-direction: column; gap: 28px; }
+      #s3 .card { display: flex; align-items: center; gap: 30px; min-height: 220px; }
+      #s3 .no { flex: none; width: 96px; height: 96px; border-radius: 48px; background: var(--ink); color: #fff; display: flex; align-items: center; justify-content: center; font-family: "JetBrains Mono", monospace; font-size: 46px; font-weight: 800; }
+      #s3 .tx { font-size: 46px; font-weight: 700; line-height: 1.15; }
+      #s3 .tx small { display: block; font-family: "JetBrains Mono", monospace; font-size: 30px; font-weight: 600; color: var(--soft); margin-top: 10px; }
+      #s3 .sl { margin-top: 14px; display: flex; flex-direction: column; gap: 12px; }
+      #s3 .tr { position: relative; width: 420px; height: 10px; border-radius: 5px; background: var(--line); }
+      #s3 .kn { position: absolute; top: -11px; left: 0; width: 32px; height: 32px; border-radius: 16px; background: var(--acc); }
+      /* s4 */
+      #s4 .meta { position: absolute; left: 0; right: 0; top: 330px; display: flex; align-items: center; gap: 30px; }
+      #s4 .meta img { width: 120px; height: 120px; flex: none; }
+      #s4 .meta .tx { font-size: 54px; font-weight: 700; }
+      #s4 .gpus { position: absolute; left: 0; right: 0; top: 560px; display: grid; grid-template-columns: repeat(16, 1fr); gap: 8px; }
+      #s4 .g { height: 50px; border: 3px solid var(--ink); border-radius: 8px; background: #fff; }
+      #s4 .gl { position: absolute; left: 0; right: 0; top: 1040px; }
+      /* s5 */
+      #s5 .q { position: absolute; right: 0; top: 400px; }
+      #s5 .toks { position: absolute; left: 0; right: 0; top: 700px; display: flex; flex-wrap: wrap; justify-content: center; gap: 30px 24px; }
+      #s5 .tk { display: flex; flex-direction: column; align-items: center; gap: 18px; }
+      #s5 .id { font-family: "JetBrains Mono", monospace; font-size: 46px; font-weight: 800; color: var(--acc); opacity: 0; }
+      #s5 .ex { position: absolute; left: 0; right: 0; top: 1000px; text-align: center; }
+      /* s6 */
+      #s6 .web { position: absolute; left: 0; right: 0; top: 520px; height: 520px; }
+      #s6 .wr { position: absolute; left: 0; right: 0; top: 0; display: flex; justify-content: space-between; }
+      #s6 .col { position: absolute; top: 110px; width: 200px; height: 280px; display: flex; align-items: flex-end; }
+      #s6 .bar { width: 100%; background: var(--ink); border-radius: 12px 12px 0 0; transform-origin: bottom center; transform: scaleY(0); }
+      #s6 .bar.a { background: var(--acc); }
+      #s6 .wt { position: absolute; left: 0; right: 0; top: 410px; }
+      #s6 .rows { position: absolute; left: 0; right: 0; top: 520px; display: flex; flex-direction: column; gap: 70px; }
+      #s6 .row { display: flex; align-items: center; gap: 26px; }
+      #s6 .ln { flex: none; width: 170px; height: 10px; border-radius: 5px; background: var(--acc); transform-origin: left center; transform: scaleX(0); }
+      #s6 .lb { font-family: "JetBrains Mono", monospace; font-size: 34px; font-weight: 800; color: var(--acc); }
+      /* s7 */
+      #s7 .q { position: absolute; left: 0; right: 0; top: 400px; font-size: 48px; font-weight: 700; white-space: nowrap; }
+      #s7 .blank { display: inline-block; min-width: 150px; border-bottom: 8px solid var(--acc); color: var(--acc); }
+      #s7 .bars { position: absolute; left: 0; right: 0; top: 570px; display: flex; flex-direction: column; gap: 24px; }
+      #s7 .br { display: flex; align-items: center; gap: 24px; font-size: 44px; font-weight: 700; }
+      #s7 .br .n { width: 260px; }
+      #s7 .br .t { flex: 1; height: 64px; border: 4px solid var(--ink); border-radius: 14px; overflow: hidden; }
+      #s7 .br .f { display: block; height: 100%; width: 100%; background: var(--ink); transform-origin: left center; transform: scaleX(0); }
+      #s7 .br.top .f { background: var(--acc); }
+      #s7 .br .p { width: 120px; text-align: right; font-family: "JetBrains Mono", monospace; font-size: 38px; }
+      #s7 .exl { position: absolute; left: 0; right: 0; top: 890px; }
+      #s7 .loop { position: absolute; left: 0; right: 0; top: 970px; display: flex; align-items: center; gap: 36px; }
+      #s7 .ring { width: 150px; height: 150px; border-radius: 75px; border: 10px solid var(--line); border-top-color: var(--acc); border-right-color: var(--acc); flex: none; }
+      #s7 .lt { font-size: 52px; font-weight: 700; }
+      /* s8 */
+      #s8 .c1 { position: absolute; left: 0; right: 0; top: 480px; }
+      #s8 .c1 .card { position: relative; font-size: 54px; font-weight: 700; text-align: center; }
+      #s8 .c2 { position: absolute; left: 0; right: 0; top: 780px; }
+      #s8 .c2 .card { font-size: 54px; font-weight: 700; text-align: center; background: var(--acc); border-color: var(--acc); color: #fff; }
+      /* s9 */
+      #s9 .ctas { position: absolute; left: 0; right: 0; top: 760px; display: flex; flex-direction: column; align-items: flex-start; gap: 40px; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="48.7" data-width="1080" data-height="1920">
+      <audio id="mix" src="assets/audio/mix.wav" data-start="0" data-duration="48.7" data-track-index="9" data-volume="1"></audio>
+      <div id="hdr"><span>UNSEEN ENGINE · <b>LLM</b></span><span id="steps"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
+
+      <div class="scene" id="s1">
+        <div class="kick">Bahut kam log jaante hain</div>
+        <div class="ttl"><span>LLM</span> <span>mein</span> <span>koi</span> <span class="a">database</span> <span>nahi</span> <span>hota</span></div>
+        <div class="myth">
+          <div class="card">Jawab kahin store hain?<div class="strike"></div><div class="stamp">NAHI</div></div>
+        </div>
+      </div>
+
+      <div class="scene" id="s2">
+        <div class="kick">Andar kya hai?</div>
+        <div class="ttl"><span>Bas</span> <span>arbon</span> <span class="a">numbers</span> <span>ka</span> <span>jaal</span></div>
+        <div class="grid">
+          <div class="cell">0.42</div><div class="cell">-1.7</div><div class="cell">0.08</div><div class="cell">2.31</div><div class="cell">-0.6</div><div class="cell">0.91</div>
+          <div class="cell">-0.2</div><div class="cell">1.05</div><div class="cell">-2.4</div><div class="cell">0.37</div><div class="cell">0.73</div><div class="cell">-0.9</div>
+          <div class="cell">1.62</div><div class="cell">0.15</div><div class="cell">-0.5</div><div class="cell">-1.1</div><div class="cell">0.28</div><div class="cell">2.04</div>
+          <div class="cell">-0.3</div><div class="cell">0.66</div><div class="cell">1.38</div><div class="cell">-1.9</div><div class="cell">0.51</div><div class="cell">-0.1</div>
+          <div class="cell">0.94</div><div class="cell">-0.7</div><div class="cell">0.22</div><div class="cell">1.77</div><div class="cell">-1.3</div><div class="cell">0.46</div>
+        </div>
+        <div class="tag ex">EXAMPLE VALUES · ASLI MODEL MEIN ARBON</div>
+        <div class="pm"><span class="chip a">= PARAMETERS</span></div>
+      </div>
+
+      <div class="scene" id="s3">
+        <div class="kick">Training</div>
+        <div class="ttl"><span class="a">Training</span> <span>=</span> <span>guess</span> <span>+</span> <span>sudhaar</span></div>
+        <div class="steps3">
+          <div class="card" id="k1"><span class="no">1</span><span class="tx">Dher saara text padho</span></div>
+          <div class="card" id="k2"><span class="no">2</span><span class="tx">Agla word guess karo<small>"Chai ke saath ..." → ?</small></span></div>
+          <div class="card" id="k3"><span class="no">3</span><span class="tx">Galti? Parameters thode badlo
+            <div class="sl"><div class="tr"><div class="kn" style="left:60px"></div></div><div class="tr"><div class="kn" style="left:250px"></div></div><div class="tr"><div class="kn" style="left:140px"></div></div></div>
+          </span></div>
+        </div>
+      </div>
+
+      <div class="scene" id="s4">
+        <div class="kick">Scale</div>
+        <div class="ttl"><span>Ek</span> <span>model</span> <span class="a">16,000</span> <span>GPU</span> <span>par</span> <span>train</span></div>
+        <div class="meta"><img src="meta.svg" alt="Meta" /><span class="tx">Meta ka ek model</span></div>
+        <div class="gpus" id="gpus"></div>
+        <div class="tag gl">HAR DABBA ≈ 125 GPU · SYMBOLIC</div>
+      </div>
+
+      <div class="scene" id="s5">
+        <div class="kick">Aapka sawal</div>
+        <div class="ttl"><span>Aapka</span> <span>sawal</span> <span class="a">→</span> <span class="a">numbers</span></div>
+        <div class="q"><div class="bub u">Mera exam kab hai?</div></div>
+        <div class="toks">
+          <div class="tk"><span class="chip">Mera</span><span class="id">1204</span></div>
+          <div class="tk"><span class="chip">exam</span><span class="id">8831</span></div>
+          <div class="tk"><span class="chip">kab</span><span class="id">560</span></div>
+          <div class="tk"><span class="chip">hai?</span><span class="id">731</span></div>
+        </div>
+        <div class="tag ex">EXAMPLE NUMBERS · HAR WORD = EK NUMBER</div>
+      </div>
+
+      <div class="scene" id="s6">
+        <div class="kick">Attention</div>
+        <div class="ttl"><span class="a">Attention</span> <span>kaun</span> <span>sa</span> <span>word</span> <span>kisse</span> <span>juda</span></div>
+        <div class="web" id="web">
+          <div class="wr"><span class="chip a" id="w0">bank</span><span class="chip">mein</span><span class="chip">paise</span><span class="chip">jama</span></div>
+          <div class="col" id="c0" style="left:0"><div class="bar" style="height:30%"></div></div>
+          <div class="col" id="c1" style="left:240px"><div class="bar" style="height:18%"></div></div>
+          <div class="col" id="c2" style="left:480px"><div class="bar a" style="height:90%"></div></div>
+          <div class="col" id="c3" style="left:720px"><div class="bar" style="height:55%"></div></div>
+          <div class="tag wt">BANK KISKO DHYAAN DETA HAI · EXAMPLE</div>
+        </div>
+        <div class="rows" id="rows">
+          <div class="row" id="r1"><span class="chip a">bank</span><span class="ln"></span><span class="chip">paise</span><span class="lb">PAISE WALA</span></div>
+          <div class="row" id="r2"><span class="chip a">bank</span><span class="ln"></span><span class="chip">nadi</span><span class="lb">NADI WALA</span></div>
+        </div>
+      </div>
+
+      <div class="scene" id="s7">
+        <div class="kick">Agla word</div>
+        <div class="ttl"><span>Har</span> <span>agla</span> <span>word</span> <span class="a">probability</span></div>
+        <div class="q">Mumbai ki baarish mein <span class="blank"><span id="fill">chai</span></span></div>
+        <div class="bars">
+          <div class="br top"><span class="n">chai</span><span class="t"><span class="f"></span></span><span class="p">48%</span></div>
+          <div class="br"><span class="n">vada pav</span><span class="t"><span class="f"></span></span><span class="p">30%</span></div>
+          <div class="br"><span class="n">bhutta</span><span class="t"><span class="f"></span></span><span class="p">22%</span></div>
+        </div>
+        <div class="tag exl">EXAMPLE PROBABILITIES</div>
+        <div class="loop"><div class="ring"></div><div class="lt">Chuno · jodo · <span style="color: var(--acc)">repeat</span></div></div>
+      </div>
+
+      <div class="scene" id="s8">
+        <div class="kick">Yaad nahi, naya</div>
+        <div class="ttl"><span>Jawab</span> <span>yaad</span> <span>nahi</span> <span>har</span> <span>baar</span> <span class="a">naya</span></div>
+        <div class="c1"><div class="card">Yaad kiya hua jawab<div class="strike"></div><div class="stamp">NAHI</div></div></div>
+        <div class="c2"><div class="card">Har baar naya banta hai</div></div>
+      </div>
+
+      <div class="scene" id="s9">
+        <div class="kick">Aapki baari</div>
+        <div class="ttl"><span>Aapko</span> <span>lagta</span> <span>hai</span> <span class="a">AI</span> <span>sach</span> <span>mein</span> <span>samajhta</span> <span>hai?</span></div>
+        <div class="ctas">
+          <div class="btn k" id="cm">Comment karo</div>
+          <div class="btn a" id="fl">+ Follow · Unseen Engine</div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const DUR = 48.7;
+      const LEAD = 0.08;
+      const T = (t) => Math.max(0, t - LEAD);
+      const tl = gsap.timeline({ paused: true });
+      const q = (s) => document.querySelector(s);
+      const qa = (s) => Array.from(document.querySelectorAll(s));
+
+      // 128 symbolic squares, one per 125 GPUs
+      const gp = q("#gpus");
+      for (let i = 0; i < 128; i++) { const d = document.createElement("div"); d.className = "g"; gp.appendChild(d); }
+
+      // keeps the timeline exactly the film length
+      tl.set({}, {}, DUR);
+
+      // scenes change 0.03 s after the last word of each sentence has finished
+      const SCENES = [
+        ["#s1", 0, 3.99],
+        ["#s2", 4.01, 8.46],
+        ["#s3", 8.48, 16.99],
+        ["#s4", 17.01, 21.58],
+        ["#s5", 21.6, 25.42],
+        ["#s6", 25.44, 32.34],
+        ["#s7", 32.36, 38.24],
+        ["#s8", 38.26, 41.2],
+        ["#s9", 41.22, DUR + 1]
+      ];
+      const steps = qa("#steps i");
+      SCENES.forEach(([sel, a, b], i) => {
+        if (a === 0) tl.set(sel, { autoAlpha: 1 }, 0);
+        else tl.fromTo(sel, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.12, ease: "none", immediateRender: false }, a);
+        if (b < DUR) tl.to(sel, { autoAlpha: 0, duration: 0.12, ease: "none" }, b);
+        tl.set(steps[i], { backgroundColor: "#4f46e5" }, Math.max(0, a));
+      });
+
+      function rv(target, t, from) {
+        tl.fromTo(target, Object.assign({ autoAlpha: 0, y: 26 }, from || {}), { autoAlpha: 1, y: 0, x: 0, scale: 1, duration: 0.28, ease: "power2.out", immediateRender: true }, T(t));
+      }
+      function words(sel, t0, t1) {
+        const w = qa(sel + " .ttl span");
+        w.forEach((el, i) => rv(el, t0 + ((t1 - t0) * i) / w.length));
+      }
+      function wordsAt(sel, times) {
+        qa(sel + " .ttl span").forEach((el, i) => rv(el, times[i]));
+      }
+
+      // S1: hook (0-3.96)
+      rv("#s1 .kick", 0.08);
+      wordsAt("#s1", [1.67, 2.29, 2.5, 2.76, 3.31, 3.53]);
+      rv("#s1 .myth", 2.0, { y: 40 });
+      tl.to("#s1 .strike", { scaleX: 1, duration: 0.25, ease: "power2.out" }, T(3.4));
+      rv("#s1 .stamp", 3.6, { scale: 1.6, y: 0 });
+
+      // S2: numbers (4.37-6.68), parameters (6.93-8.43)
+      rv("#s2 .kick", 4.37);
+      wordsAt("#s2", [4.37, 5.06, 5.52, 5.94, 6.11]);
+      qa("#s2 .cell").forEach((el, i) => rv(el, 5.0 + i * 0.045, { scale: 0.7, y: 0 }));
+      rv("#s2 .ex", 6.4);
+      rv("#s2 .pm", 7.15, { scale: 0.7, y: 0 });
+
+      // S3: training (8.98-16.96)
+      rv("#s3 .kick", 8.98);
+      wordsAt("#s3", [8.98, 9.3, 9.6, 9.9, 10.2]);
+      rv("#k1", 10.4, { x: -60, y: 0 });
+      rv("#k2", 12.33, { x: -60, y: 0 });
+      rv("#k3", 14.86, { x: -60, y: 0 });
+      qa("#k3 .kn").forEach((el, i) => tl.to(el, { x: [180, -90, 120][i], duration: 0.7, ease: "power2.inOut" }, T(15.5 + i * 0.15)));
+
+      // S4: Meta, 16,000 GPUs (17.51-21.55)
+      rv("#s4 .kick", 17.51);
+      wordsAt("#s4", [17.6, 18.0, 18.94, 19.9, 20.4, 20.7]);
+      rv("#s4 .meta", 17.7, { x: -60, y: 0 });
+      rv("#gpus", 18.94, { y: 0 });
+      tl.to("#s4 .g", { backgroundColor: "#4f46e5", borderColor: "#4f46e5", duration: 0.2, ease: "none", stagger: { each: 0.012 } }, T(19.5));
+      rv("#s4 .gl", 19.4);
+
+      // S5: your question (21.71-22.99), numbers (23.36-25.39)
+      rv("#s5 .kick", 21.71);
+      wordsAt("#s5", [21.92, 22.01, 23.36, 24.31]);
+      rv("#s5 .q", 22.0, { x: 60, y: 0 });
+      qa("#s5 .chip").forEach((el, i) => rv(el, 23.36 + i * 0.35, { scale: 0.6, y: 0 }));
+      qa("#s5 .id").forEach((el, i) => rv(el, 24.31 + i * 0.12, { y: -14 }));
+      rv("#s5 .ex", 23.1);
+
+      // S6: attention (25.6-29.03), bank examples (29.6-32.31)
+      rv("#s6 .kick", 25.6);
+      wordsAt("#s6", [25.6, 27.17, 27.56, 27.79, 28.12, 28.44]);
+      rv("#s6 .wr", 26.2, { y: 0 });
+      qa("#s6 .bar").forEach((el, i) => tl.to(el, { scaleY: 1, duration: 0.3, ease: "power2.out" }, T(27.4 + i * 0.2)));
+      rv("#s6 .wt", 26.6);
+      tl.to("#web", { autoAlpha: 0, duration: 0.12, ease: "none" }, 29.4);
+      rv("#r1", 29.65, { x: -60, y: 0 });
+      tl.to("#r1 .ln", { scaleX: 1, duration: 0.25, ease: "power2.out" }, T(30.2));
+      rv("#r2", 31.45, { x: -60, y: 0 });
+      tl.to("#r2 .ln", { scaleX: 1, duration: 0.25, ease: "power2.out" }, T(31.7));
+
+      // S7: probability (32.68-35.07), pick + loop (35.5-38.21)
+      rv("#s7 .kick", 32.68);
+      wordsAt("#s7", [32.96, 33.29, 33.58, 33.98]);
+      rv("#s7 .q", 33.1);
+      const P = [0.48, 0.3, 0.22];
+      qa("#s7 .br").forEach((el, i) => {
+        rv(el, 34.0 + i * 0.15, { x: -40, y: 0 });
+        tl.fromTo(el.querySelector(".f"), { scaleX: 0 }, { scaleX: P[i], duration: 0.3, ease: "power2.out", immediateRender: true }, T(34.2 + i * 0.15));
+      });
+      rv("#s7 .exl", 34.7);
+      rv("#fill", 36.0, { y: -30 });
+      rv("#s7 .loop", 37.14, { y: 40 });
+      tl.fromTo("#s7 .ring", { rotation: 0 }, { rotation: 720, duration: 2.4, ease: "none", immediateRender: true }, T(37.14));
+
+      // S8: not remembered, made new each time (38.5-41.17)
+      rv("#s8 .kick", 38.5);
+      wordsAt("#s8", [38.79, 39.11, 39.35, 39.82, 40.1, 40.43]);
+      rv("#s8 .c1", 39.0, { x: -60, y: 0 });
+      tl.to("#s8 .strike", { scaleX: 1, duration: 0.25, ease: "power2.out" }, T(39.55));
+      rv("#s8 .stamp", 39.75, { scale: 1.6, y: 0 });
+      rv("#s8 .c2", 39.65, { x: 60, y: 0 });
+
+      // S9: question (41.58-43.87), comment (44.42), follow (45.58)
+      rv("#s9 .kick", 41.58);
+      words("#s9", 41.58, 43.6);
+      rv("#cm", 44.42, { scale: 0.8, y: 0 });
+      rv("#fl", 45.58, { scale: 0.8, y: 0 });
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>
