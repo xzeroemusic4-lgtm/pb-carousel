@@ -39,3 +39,4 @@ The series is "Unseen Engine": how the systems Indians use every day really work
 - RAC: why two strangers share one berth (2 Nov 2026)
 - ChatGPT: what it is and how it answers, step by step (2 Nov 2026)
 - LLMs: how they actually work (3 Nov 2026)
+- Flipkart Minutes: how 10-minute delivery works, the full backend (3 Nov 2026)
