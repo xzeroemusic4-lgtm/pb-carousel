@@ -34,6 +34,8 @@ Two runs a day. The 7:00 AM India run publishes at 8:00 AM, and the 5:00 PM Indi
     - The Instagram page for this series is "unseen engine" (the Instagram account connected to Metricool blogId `7202794`). Use that name wherever a page name is needed.
     - Instagram `info`: `providers` instagram, `videoCoverMilliseconds` 1000, `instagramData` `{"type":"REEL","showReelOnFeed":true,"isAiGenerated":true}`.
     - YouTube `info`: `providers` youtube, `youtubeData` `{"title":"...","type":"short","privacy":"public","tags":[...],"category":"EDUCATION","madeForKids":false,"isAiGeneratedContent":true}`.
+    - Write every caption, title, hashtag set and tag list as an expert social media specialist growing an Indian tech-explainer page: a scroll-stopping first line, the payoff in two or three short lines, a comment question, a save or share call, then hashtags.
+    - Hashtags: the most-searched tags that truly match the topic, never banned, spammy or off-topic ones. Instagram: exactly 5 (Instagram now caps posts at 5), the topic's biggest tag first and `#UnseenEngine` last. YouTube: 3 to 5 in the description (more than 15 makes YouTube ignore all of them, and the first 3 show above the title), plus up to 15 keyword tags in `tags`, including `unseen engine`.
 11. Confirm both with `getScheduledPosts`. If one call fails, do not repeat the other.
 12. Move the topic to Done in `state/topics.md`, add 2 to `posts_used`, and commit the reel folder source and the state files.
 13. Send one push notification with the topic and the time: "Scheduled <topic> for <time>. It publishes by itself."
