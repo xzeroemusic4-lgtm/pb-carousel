@@ -1,0 +1,16 @@
+बहुत कम लोगों को पता है कि LLM में कोई database नहीं होता।
+अंदर बस अरबों numbers का जाल है।
+इन्हें parameters कहते हैं।
+Training में model ने ढेर सारा text पढ़ा।
+हर बार अगला word guess किया।
+गलती पर parameters थोड़े बदले गए।
+Meta का एक model सोलह हज़ार जी पी यू पर train हुआ।
+अब आप सवाल पूछते हो।
+आपके words numbers बनते हैं।
+Attention देखता है कौन सा word किससे जुड़ा है।
+जैसे bank पैसे वाला है या नदी वाला।
+फिर हर अगले word को probability मिलती है।
+एक word चुना जाता है और loop चलता है।
+यानी जवाब याद नहीं होता हर बार नया बनता है।
+आपको लगता है AI सच में समझता है? Comment करो।
+Follow Unseen Engine for more.
