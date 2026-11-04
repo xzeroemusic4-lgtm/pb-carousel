@@ -1,0 +1,15 @@
+Flipkart Minutes दस मिनट में कैसे पहुंचता है?
+इसके पीछे एक पूरा सिस्टम चलता है जो किसी को दिखता नहीं।
+पहला राज़ है dark store।
+ये छोटा warehouse आपकी colony के पास होता है।
+सामान दूर से नहीं आता।
+वो पहले से आपके पास रखा होता है।
+पर किस store में क्या रखना है?
+Flipkart अपने supply chain में demand forecast के लिए machine learning इस्तेमाल करता है।
+यानी पुरानी sales देखकर अंदाज़ा कि आज क्या बिकेगा।
+फिर order आता है।
+Picker rack से सामान उठाता है और rider निकल पड़ता है।
+ये जादू नहीं है planning है।
+पर दस मिनट एक वादा है हर बार की गारंटी नहीं।
+आपके लिए ज़रूरी क्या है speed या सही सामान? Comment करो।
+Follow Unseen Engine for more.
