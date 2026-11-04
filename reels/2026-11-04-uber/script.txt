@@ -1,0 +1,14 @@
+क्या तुमने कभी सोचा?
+जब भी तुम Uber से ride book करते हो तो सबसे पास वाला driver तुम्हारे पास कैसे आता है?
+आपका phone location Uber के servers को भेजता है।
+Uber पूरे शहर को hexagons में बांटता है।
+इस grid का नाम एच थ्री है।
+इससे आसपास के drivers तुरंत मिल जाते हैं।
+पर सबसे पास का मतलब सीधी दूरी नहीं है।
+Routing engine सड़क और traffic देखकर पहुंचने का समय निकालता है।
+मान लो driver पास है पर बीच में flyover है।
+फिर एक AI model इस अंदाज़े को ठीक करता है।
+Uber इसे DeepETA कहता है।
+यानी पास का मतलब दूरी नहीं समय है।
+आपको कौन सा driver कितनी जल्दी मिला? Comment करो।
+Follow Unseen Engine for more.
