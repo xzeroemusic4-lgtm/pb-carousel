@@ -1,0 +1,819 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="vendor/gsap.min.js"></script>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "./vendor/three/build/three.module.js",
+          "three/addons/": "./vendor/three/examples/jsm/"
+        }
+      }
+    </script>
+    <style>
+      @font-face {
+        font-family: "Space Grotesk";
+        src: url("assets/fonts/space-grotesk.woff2") format("woff2");
+        font-weight: 300 700;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: "JetBrains Mono";
+        src: url("assets/fonts/jetbrains-mono.woff2") format("woff2");
+        font-weight: 100 800;
+        font-style: normal;
+      }
+      :root {
+        --bg: #eef1f5;
+        --ink: #14171d;
+        --soft: #5b6573;
+        --line: #14171d;
+        --acc: #ff6b1a;
+        --acc-dark: #c24a00;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: var(--bg); }
+      #root { position: relative; width: 100%; height: 100%; overflow: hidden; background: var(--bg); color: var(--ink); font-family: "Space Grotesk", sans-serif; }
+      #stage { position: absolute; inset: 0; overflow: hidden; }
+      #gl { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+      #shade {
+        position: absolute; inset: 0;
+        background:
+          linear-gradient(180deg, rgba(238, 241, 245, 0.95) 0%, rgba(238, 241, 245, 0.6) 12%, rgba(238, 241, 245, 0) 22%),
+          linear-gradient(0deg, rgba(238, 241, 245, 0.85) 0%, rgba(238, 241, 245, 0) 14%);
+      }
+      #anchors, #ui { position: absolute; inset: 0; }
+      .anc { position: absolute; left: 0; top: 0; width: 0; height: 0; opacity: 0; }
+      .pin { position: absolute; left: 0; top: 0; white-space: nowrap; transform: translate(-50%, -100%); }
+      .pin.c { transform: translate(-50%, -50%); }
+      .chip {
+        opacity: 0; display: inline-block;
+        font: 700 28px/1.1 "JetBrains Mono", monospace; letter-spacing: 0.06em; text-transform: uppercase;
+        color: var(--ink); background: rgba(255, 255, 255, 0.96); border: 2px solid var(--ink); border-radius: 8px;
+        padding: 8px 14px; box-shadow: 0 6px 16px rgba(20, 23, 29, 0.18);
+      }
+      .chip.a { color: #fff; background: var(--acc); border-color: var(--acc); }
+      .chip.k { color: #fff; background: var(--ink); border-color: var(--ink); }
+      .chip.big { font-size: 34px; padding: 12px 20px; }
+      #hdr { position: absolute; left: 64px; right: 64px; top: 210px; font: 600 28px/1 "JetBrains Mono", monospace; letter-spacing: 0.16em; color: var(--soft); }
+      #hdr b { color: var(--acc); font-weight: 800; }
+      .card {
+        position: absolute; left: 64px; width: 952px; top: 270px; opacity: 0;
+        background: rgba(255, 255, 255, 0.95); border: 3px solid var(--ink); border-radius: 14px;
+        padding: 20px 32px 26px; box-shadow: 0 14px 30px rgba(20, 23, 29, 0.16);
+      }
+      .card.y { border-color: var(--acc); }
+      .ov { font: 700 28px/1.2 "JetBrains Mono", monospace; letter-spacing: 0.16em; color: var(--acc-dark); text-transform: uppercase; }
+      .ttl { position: relative; font-weight: 700; font-size: 66px; line-height: 1.14; color: var(--ink); margin-top: 8px; letter-spacing: -0.01em; }
+      .sub { font: 600 28px/1.4 "JetBrains Mono", monospace; letter-spacing: 0.06em; color: var(--soft); margin-top: 10px; text-transform: uppercase; }
+      .w { display: inline-block; opacity: 0; }
+      .hid { opacity: 0; }
+      .ak { color: var(--acc); }
+      .logo { display: inline-block; width: 60px; height: 60px; vertical-align: -8px; margin-right: 16px; opacity: 0; }
+      #pipe { position: absolute; left: 64px; width: 952px; top: 1080px; display: flex; flex-direction: column; gap: 14px; }
+      #pipe .row { opacity: 0; display: flex; align-items: center; gap: 18px; background: rgba(255, 255, 255, 0.96); border: 3px solid var(--ink); border-radius: 12px; padding: 12px 22px; font-weight: 700; font-size: 44px; }
+      #pipe .row b { flex: none; width: 56px; height: 56px; border-radius: 28px; background: var(--ink); color: #fff; display: flex; align-items: center; justify-content: center; font: 800 30px/1 "JetBrains Mono", monospace; }
+      #pipe .row.a { border-color: var(--acc); }
+      #pipe .row.a b { background: var(--acc); }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="137.1" data-width="1080" data-height="1920">
+      <audio id="mix" src="assets/audio/mix.wav" data-start="0" data-duration="137.1" data-track-index="9" data-volume="1"></audio>
+      <div id="stage">
+        <canvas id="gl" width="1080" height="1920" data-layout-allow-overflow=""></canvas>
+        <div id="shade"></div>
+        <div id="anchors" data-layout-allow-overflow="" data-layout-allow-overlap=""></div>
+        <div id="ui">
+          <div id="hdr">UNSEEN ENGINE · <b>UBER</b></div>
+          <div id="pipe">
+            <div class="row" id="pp0"><b>1</b>GPS location</div>
+            <div class="row" id="pp1"><b>2</b>H3 hex grid</div>
+            <div class="row" id="pp2"><b>3</b>Routing engine</div>
+            <div class="row a" id="pp3"><b>4</b>DeepETA model</div>
+            <div class="row" id="pp4"><b>5</b>Batch matching</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module">
+      import * as THREE from "three";
+      import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+      import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
+      import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
+      import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
+      import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
+      import { ShaderPass } from "three/addons/postprocessing/ShaderPass.js";
+      import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
+
+      // One light city, one continuous camera. Scenes (s): 0-15 hook, 18-32 GPS location, 32-50.5 hex grid,
+      // 50.8-70 real distance and routing engine, 70.8-86.8 DeepETA, 87-109 batch matching, 109.7-115 request,
+      // 116-122 recap, 122.5-127.5 caveat, 128-137 question and follow.
+      const DUR = 137.1, W = 1080, H = 1920, FOV = 38, BLOOM = 1, BG = 0xeef1f5;
+      const HR = 1.3; // hexagon radius
+
+      const easeCache = {};
+      const ease = (n) => easeCache[n] || (easeCache[n] = gsap.parseEase(n));
+      const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+      function track(keys) {
+        const es = keys.map((k) => ease(k[2] || "none"));
+        return (t) => {
+          if (t <= keys[0][0]) return keys[0][1];
+          for (let i = 1; i < keys.length; i++) {
+            if (t <= keys[i][0]) {
+              const [t0, v0] = keys[i - 1];
+              const [t1, v1] = keys[i];
+              return v0 + (v1 - v0) * es[i]((t - t0) / (t1 - t0));
+            }
+          }
+          return keys[keys.length - 1][1];
+        };
+      }
+      function seg(t, t0, t1, v0, v1, e = "none") {
+        if (t <= t0) return v0;
+        if (t >= t1) return v1;
+        return v0 + (v1 - v0) * ease(e)((t - t0) / (t1 - t0));
+      }
+      const hash = (i, k = 1) => {
+        const x = Math.sin(i * 127.1 + k * 311.7) * 43758.5453;
+        return x - Math.floor(x);
+      };
+      const C = (h) => new THREE.Color(h);
+      const V = (x, y, z) => new THREE.Vector3(x, y, z);
+      const COL = { acc: C(0xff6b1a), ink: C(0x20242c), mid: C(0x8b95a5), dim: C(0xb9c1cd), car: C(0x23272f), white: C(0xffffff) };
+      function colorTrack(keys, dur = 0.25) {
+        return (t, out) => {
+          let i = 0;
+          while (i + 1 < keys.length && t >= keys[i + 1][0]) i++;
+          out.copy(COL[keys[i][1]]);
+          if (i > 0) out.copy(COL[keys[i - 1][1]]).lerp(COL[keys[i][1]], clamp((t - keys[i][0]) / dur, 0, 1));
+          return out;
+        };
+      }
+
+      // Camera poses [position, look-at]
+      const P = {
+        p0: [[0.5, 11.5, 10.5], [0, 0, -0.4]], p0b: [[0.4, 10.8, 9.8], [0, 0, -0.3]],
+        p1: [[0.3, 8.8, 7.4], [0, 0, -0.2]], p1b: [[0.3, 8.4, 7.0], [0, 0, -0.2]],
+        p2: [[1.4, 10.5, 9.2], [1.3, 0.6, -1.3]], p2b: [[1.1, 10, 8.6], [1.3, 0.6, -1.3]],
+        p9: [[0.2, 6.8, 5.4], [0, 0, 0]], p9b: [[0.2, 6.4, 5.0], [0, 0, 0]],
+        p3: [[0.2, 20, 6], [0, 0, 0]], p3b: [[0.2, 19, 5.4], [0, 0, 0]],
+        p6: [[2.6, 7.2, 6.4], [1.9, 0.2, 0.6]], p6b: [[2.4, 6.9, 6], [1.9, 0.2, 0.6]],
+        p5: [[1.3, 14.5, 11.2], [1.3, 0, -1.3]], p5b: [[1.1, 14, 10.7], [1.2, 0, -1.3]],
+        p7: [[1.0, 12.5, 10.2], [0.9, 0.5, -0.9]], p7b: [[0.9, 12, 9.8], [0.9, 0.5, -0.9]],
+        p8: [[0, 12.5, 9.2], [-0.7, 0, 0]], p8b: [[0, 12, 8.8], [-0.7, 0, 0]],
+      };
+      const CAM = [
+        [0, P.p0], [10, P.p1, "sine.inOut"], [17.7, P.p1b, "sine.inOut"],
+        [18.4, P.p2, "power3.inOut"], [23.6, P.p2b, "sine.inOut"],
+        [24.3, P.p9, "power3.inOut"], [31.7, P.p9b, "sine.inOut"],
+        [32.4, P.p3, "power3.inOut"], [50.5, P.p3b, "sine.inOut"],
+        [53.2, P.p6, "power3.inOut"], [61.3, P.p6b, "sine.inOut"],
+        [62.2, P.p5, "power3.inOut"], [70.6, P.p5b, "sine.inOut"],
+        [71.5, P.p7, "power3.inOut"], [86.9, P.p7b, "sine.inOut"],
+        [87.8, P.p8, "power3.inOut"], [115.4, P.p8b, "sine.inOut"],
+        [116.4, P.p0, "power3.inOut"], [DUR, P.p0b, "sine.inOut"],
+      ];
+      const camP = [0, 1, 2].map((i) => track(CAM.map((k) => [k[0], k[1][0][i], k[2]])));
+      const camL = [0, 1, 2].map((i) => track(CAM.map((k) => [k[0], k[1][1][i], k[2]])));
+
+      // Renderer + selective bloom (strength 0.2, radius 0.28)
+      const canvas = document.getElementById("gl");
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: true });
+      renderer.setPixelRatio(2 / 3);
+      renderer.setSize(W, H, false);
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      renderer.toneMapping = THREE.NeutralToneMapping;
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+      const scene = new THREE.Scene();
+      const bgColor = new THREE.Color(BG);
+      scene.background = bgColor;
+      scene.fog = new THREE.Fog(BG, 30, 80);
+      scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), 0.04).texture;
+      scene.environmentIntensity = 0.3;
+      const camera = new THREE.PerspectiveCamera(FOV, W / H, 0.1, 240);
+      camera.layers.enable(BLOOM);
+      scene.add(camera);
+      const lookAt = new THREE.Vector3();
+      scene.add(new THREE.HemisphereLight(0xffffff, 0xc9d1dc, 0.95));
+      const key = new THREE.DirectionalLight(0xffffff, 1.35);
+      key.position.set(6, 16, 8);
+      key.castShadow = true;
+      key.shadow.mapSize.set(2048, 2048);
+      key.shadow.camera.left = -11; key.shadow.camera.right = 11; key.shadow.camera.top = 11; key.shadow.camera.bottom = -11;
+      key.shadow.camera.near = 1; key.shadow.camera.far = 50;
+      key.shadow.bias = -0.0005;
+      scene.add(key);
+
+      const pr = renderer.getPixelRatio();
+      const renderScene = new RenderPass(scene, camera);
+      const bloomComposer = new EffectComposer(renderer);
+      bloomComposer.renderToScreen = false;
+      bloomComposer.addPass(renderScene);
+      bloomComposer.addPass(new UnrealBloomPass(new THREE.Vector2(W * pr, H * pr), 0.2, 0.28, 0.0));
+      const mixPass = new ShaderPass(
+        new THREE.ShaderMaterial({
+          uniforms: { baseTexture: { value: null }, bloomTexture: { value: bloomComposer.renderTarget2.texture } },
+          vertexShader: "varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }",
+          fragmentShader:
+            "uniform sampler2D baseTexture; uniform sampler2D bloomTexture; varying vec2 vUv; void main(){ gl_FragColor = texture2D(baseTexture, vUv) + texture2D(bloomTexture, vUv); }",
+        }),
+        "baseTexture",
+      );
+      mixPass.needsSwap = true;
+      const finalComposer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(W * pr, H * pr, { type: THREE.HalfFloatType, samples: 2 }));
+      finalComposer.addPass(renderScene);
+      finalComposer.addPass(mixPass);
+      finalComposer.addPass(new OutputPass());
+      const glow = (o) => { o.traverse((m) => m.layers.enable(BLOOM)); return o; };
+      const blackMat = new THREE.MeshBasicMaterial({ color: 0x000000, fog: false });
+      const bloomLayer = new THREE.Layers();
+      bloomLayer.set(BLOOM);
+      const saved = new Map();
+      function darken(o) {
+        if (!o.visible || o.layers.test(bloomLayer)) return;
+        if (o.isMesh) { saved.set(o, o.material); o.material = blackMat; }
+      }
+      const std = (color, o = {}) => new THREE.MeshStandardMaterial({ color, roughness: 0.6, metalness: 0.05, ...o });
+      const glowMat = (color, o = {}) => new THREE.MeshBasicMaterial({ color, transparent: true, depthWrite: false, ...o });
+      const add = (parent, geo, mat, x = 0, y = 0, z = 0) => {
+        const m = new THREE.Mesh(geo, mat);
+        m.position.set(x, y, z);
+        parent.add(m);
+        return m;
+      };
+      const shadowed = (m, cast = true, recv = true) => { m.castShadow = cast; m.receiveShadow = recv; return m; };
+
+      // ---------------------------------------------------------------------------
+      // World
+      // ---------------------------------------------------------------------------
+      let built = false;
+      const world = {};
+      const hexCenter = (q, r) => [HR * 1.5 * q, HR * Math.sqrt(3) * (r + q / 2)];
+      const hexOf = (x, z) => {
+        const fq = ((2 / 3) * x) / HR, fr = ((-1 / 3) * x + (Math.sqrt(3) / 3) * z) / HR, fs = -fq - fr;
+        let q = Math.round(fq), r = Math.round(fr), s = Math.round(fs);
+        const dq = Math.abs(q - fq), dr = Math.abs(r - fr), ds = Math.abs(s - fs);
+        if (dq > dr && dq > ds) q = -r - s; else if (dr > ds) r = -q - s;
+        return [q, r];
+      };
+      const hexDist = (q, r) => (Math.abs(q) + Math.abs(r) + Math.abs(q + r)) / 2;
+      const yawOf = (dx, dz) => Math.atan2(-dz, dx);
+      function pathSampler(pts) {
+        const L = [0];
+        for (let i = 1; i < pts.length; i++) L.push(L[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1], (pts[i][2] || 0) - (pts[i - 1][2] || 0)));
+        const total = L[L.length - 1];
+        return (u) => {
+          const d = clamp(u, 0, 1) * total;
+          let i = 1;
+          while (i < pts.length - 1 && d > L[i]) i++;
+          const k = (d - L[i - 1]) / (L[i] - L[i - 1] || 1);
+          const a = pts[i - 1], b = pts[i];
+          return { x: a[0] + (b[0] - a[0]) * k, z: a[1] + (b[1] - a[1]) * k, y: (a[2] || 0) + ((b[2] || 0) - (a[2] || 0)) * k, yaw: yawOf(b[0] - a[0], b[1] - a[1]) };
+        };
+      }
+      function tubeFor(pts, color, r = 0.04, lift = 0.06) {
+        const path = new THREE.CurvePath();
+        for (let i = 1; i < pts.length; i++) path.add(new THREE.LineCurve3(V(pts[i - 1][0], (pts[i - 1][2] || 0) + lift, pts[i - 1][1]), V(pts[i][0], (pts[i][2] || 0) + lift, pts[i][1])));
+        const tubSeg = 90, rad = 6;
+        const geo = new THREE.TubeGeometry(path, tubSeg, r, rad, false);
+        const mesh = new THREE.Mesh(geo, glowMat(color, { opacity: 0.95 }));
+        mesh.userData = { tubSeg, rad };
+        glow(mesh);
+        scene.add(mesh);
+        return mesh;
+      }
+      const setDraw = (mesh, f) => {
+        const { tubSeg, rad } = mesh.userData;
+        mesh.geometry.setDrawRange(0, Math.floor(clamp(f, 0, 1) * tubSeg) * rad * 6);
+        mesh.visible = f > 0.001;
+      };
+      function linkTube(a, b, color, r) {
+        const m = new THREE.Mesh(new THREE.TubeGeometry(new THREE.LineCurve3(V(a[0], 0.14, a[1]), V(b[0], 0.14, b[1])), 2, r, 6, false), glowMat(color, { opacity: 0 }));
+        glow(m);
+        scene.add(m);
+        return m;
+      }
+
+      const CARS = [
+        { id: "A", x: 1.5, z: 0, y: 0.34, yaw: 0, t: 3.0, col: [[-1, "car"]] },
+        { id: "C", x: -1.5, z: 1.5, y: 0, yaw: yawOf(0, -1), t: 3.1, col: [[-1, "car"], [13.0, "acc"]] },
+        { id: "E", x: 0, z: -3, y: 0, yaw: yawOf(0, 1), t: 3.35, col: [[-1, "car"]] },
+        { id: "B", x: -1.5, z: -3, y: 0, yaw: yawOf(1, 0), t: 3.6, col: [[-1, "car"], [47.3, "dim"]] },
+        { id: "D", x: -4.5, z: 0, y: 0, yaw: yawOf(1, 0), t: 3.85, col: [[-1, "car"], [47.3, "dim"]] },
+        { id: "F", x: 4.5, z: -4.5, y: 0, yaw: yawOf(-1, 0), t: 4.1, col: [[-1, "car"], [47.3, "dim"]] },
+        { id: "G", x: -3, z: 4.5, y: 0, yaw: yawOf(0, -1), t: 4.35, col: [[-1, "car"], [47.3, "dim"]] },
+        { id: "H", x: 3, z: 4.5, y: 0, yaw: yawOf(-1, 0), t: 4.6, col: [[-1, "car"], [47.3, "dim"]] },
+      ];
+      const ROUTES = {
+        A: [[1.5, 0, 0.34], [3, 0, 0.34], [4.5, 0, 0], [4.5, 1.5, 0], [0, 1.5, 0], [0, 0, 0]],
+        C: [[-1.5, 1.5, 0], [-1.5, 0, 0], [0, 0, 0]],
+        E: [[0, -3, 0], [0, 0, 0]],
+      };
+      const TOWER = V(2.6, 0, -3.0);
+      const R2 = [-3, 0];
+
+      // Detailed taxi: extruded body shell, glass cabin, roof, wheels with rims, lights and a roof lamp
+      function makeCar(color) {
+        const g = new THREE.Group();
+        const mat = std(color, { roughness: 0.35, metalness: 0.3 });
+        const body = new THREE.Shape();
+        [[-0.46, 0.07], [0.46, 0.07], [0.47, 0.13], [0.44, 0.18], [0.28, 0.2], [-0.3, 0.2], [-0.44, 0.18], [-0.47, 0.13]].forEach(([x, y], i) => (i ? body.lineTo(x, y) : body.moveTo(x, y)));
+        const bg = new THREE.ExtrudeGeometry(body, { depth: 0.3, bevelEnabled: true, bevelSize: 0.03, bevelThickness: 0.03, bevelSegments: 3 });
+        bg.translate(0, 0, -0.15);
+        shadowed(add(g, bg, mat));
+        const cab = new THREE.Shape();
+        [[-0.25, 0.2], [-0.17, 0.335], [0.07, 0.335], [0.22, 0.2]].forEach(([x, y], i) => (i ? cab.lineTo(x, y) : cab.moveTo(x, y)));
+        const cg = new THREE.ExtrudeGeometry(cab, { depth: 0.28, bevelEnabled: true, bevelSize: 0.015, bevelThickness: 0.015, bevelSegments: 2 });
+        cg.translate(0, 0, -0.14);
+        shadowed(add(g, cg, std(0x1b2230, { roughness: 0.12, metalness: 0.7 })), true, false);
+        shadowed(add(g, new RoundedBoxGeometry(0.26, 0.025, 0.3, 2, 0.01), mat, -0.05, 0.345, 0), true, false);
+        const tire = std(0x0b0d11, { roughness: 0.9 }), rimM = std(0xc7ced8, { roughness: 0.3, metalness: 0.8 });
+        const wg = new THREE.CylinderGeometry(0.075, 0.075, 0.06, 18).rotateX(Math.PI / 2);
+        const rg = new THREE.CylinderGeometry(0.045, 0.045, 0.066, 14).rotateX(Math.PI / 2);
+        [[0.3, 0.19], [0.3, -0.19], [-0.3, 0.19], [-0.3, -0.19]].forEach(([x, z]) => {
+          shadowed(add(g, wg, tire, x, 0.075, z), true, false);
+          add(g, rg, rimM, x, 0.075, z * 1.02);
+        });
+        const hm = new THREE.MeshBasicMaterial({ color: 0xfff4cf });
+        [0.1, -0.1].forEach((z) => glow(add(g, new THREE.BoxGeometry(0.03, 0.035, 0.07), hm, 0.505, 0.14, z)));
+        const tm = new THREE.MeshBasicMaterial({ color: COL.acc });
+        [0.1, -0.1].forEach((z) => glow(add(g, new THREE.BoxGeometry(0.03, 0.03, 0.07), tm, -0.505, 0.14, z)));
+        glow(add(g, new THREE.BoxGeometry(0.09, 0.04, 0.16), new THREE.MeshBasicMaterial({ color: COL.acc }), -0.03, 0.385, 0));
+        return { g, mat };
+      }
+      function makePin() {
+        const pin = new THREE.Group();
+        add(pin, new THREE.ConeGeometry(0.1, 0.34, 18).rotateX(Math.PI), glowMat(COL.acc), 0, 0.17, 0);
+        add(pin, new THREE.SphereGeometry(0.13, 20, 16), glowMat(COL.acc), 0, 0.42, 0);
+        glow(pin);
+        scene.add(pin);
+        return pin;
+      }
+
+      function buildWorld() {
+        const ground = add(scene, new THREE.PlaneGeometry(90, 90).rotateX(-Math.PI / 2), std(0xdde3ea, { roughness: 0.95 }), 0, -0.005, 0);
+        ground.receiveShadow = true;
+        const blocks = [];
+        for (let i = -6; i <= 5; i++) for (let j = -7; j <= 6; j++) {
+          const bx = i * 1.5 + 0.75, bz = j * 1.5 + 0.75;
+          if (Math.abs(bx) < 0.1 && Math.abs(bz) < 0.1) continue;
+          blocks.push([bx, bz, 0.1 + hash(i * 17 + j, 3) * 0.5 + (hash(i + j * 13, 5) > 0.88 ? 0.35 : 0)]);
+        }
+        const bm = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), std(0xffffff, { roughness: 0.85 }), blocks.length);
+        bm.castShadow = true; bm.receiveShadow = true;
+        const m4 = new THREE.Matrix4(), col = new THREE.Color();
+        blocks.forEach(([x, z, h], i) => {
+          m4.compose(V(x, h / 2, z), new THREE.Quaternion(), V(1.0, h, 1.0));
+          bm.setMatrixAt(i, m4);
+          col.set(0xffffff).lerp(C(0xd8dfe8), hash(i, 9) * 0.8);
+          bm.setColorAt(i, col);
+        });
+        scene.add(bm);
+
+        // flyover along the z=0 road from x=0.9 to x=3, ramp down to x=4.5; no ramp at the west end
+        const deckM = std(0x4a5260, { roughness: 0.6 });
+        shadowed(add(scene, new THREE.BoxGeometry(2.1, 0.08, 0.46), deckM, 1.95, 0.3, 0));
+        const ramp = shadowed(add(scene, new THREE.BoxGeometry(Math.hypot(1.5, 0.34), 0.08, 0.46), deckM, 3.75, 0.17, 0));
+        ramp.rotation.z = -Math.atan2(0.34, 1.5);
+        [1.2, 2.4].forEach((x) => shadowed(add(scene, new THREE.CylinderGeometry(0.05, 0.05, 0.3, 10), std(0x9aa4b2), x, 0.15, 0)));
+        world.barrier = glow(add(scene, new THREE.BoxGeometry(0.07, 0.2, 0.46), new THREE.MeshBasicMaterial({ color: COL.acc }), 0.9, 0.42, 0));
+
+        world.pin = makePin();
+        world.pin2 = makePin();
+        world.pin2.position.set(R2[0], 0, R2[1]);
+        world.pulse = glow(add(scene, new THREE.RingGeometry(0.2, 0.25, 40).rotateX(-Math.PI / 2), glowMat(COL.acc), 0, 0.03, 0));
+        world.phone = new THREE.Group();
+        add(world.phone, new RoundedBoxGeometry(0.26, 0.46, 0.035, 3, 0.03), std(0x14171d, { roughness: 0.4 }));
+        glow(add(world.phone, new THREE.PlaneGeometry(0.2, 0.38), new THREE.MeshBasicMaterial({ color: COL.acc }), 0, 0, 0.02));
+        world.phone.position.set(0, 0.95, 0);
+        world.phone.rotation.x = -0.55;
+        scene.add(world.phone);
+
+        // GPS accuracy circle and the raw GPS dot
+        world.acc = add(scene, new THREE.CircleGeometry(1, 56).rotateX(-Math.PI / 2), glowMat(COL.ink, { opacity: 0 }), 0, 0.02, 0);
+        world.accRing = glow(add(scene, new THREE.RingGeometry(0.95, 1, 64).rotateX(-Math.PI / 2), glowMat(COL.ink, { opacity: 0 }), 0, 0.025, 0));
+        world.gps = glow(add(scene, new THREE.SphereGeometry(0.1, 16, 12), glowMat(COL.ink), 0, 0.12, 0));
+
+        // server tower
+        world.tower = new THREE.Group();
+        for (let k = 0; k < 4; k++) {
+          shadowed(add(world.tower, new RoundedBoxGeometry(0.5, 0.22, 0.4, 3, 0.03), std(0xf4f6f9, { roughness: 0.5 }), 0, 0.14 + k * 0.27, 0));
+          glow(add(world.tower, new THREE.BoxGeometry(0.06, 0.05, 0.02), new THREE.MeshBasicMaterial({ color: COL.acc }), 0.17, 0.14 + k * 0.27, 0.205));
+        }
+        world.tower.position.copy(TOWER);
+        scene.add(world.tower);
+        const arc = new THREE.CatmullRomCurve3([V(0, 1.15, 0), V(1.0, 2.6, -1.4), V(TOWER.x, 1.5, TOWER.z)]);
+        world.arc = arc;
+        world.arcMesh = glow(new THREE.Mesh(new THREE.TubeGeometry(arc, 40, 0.014, 6), glowMat(COL.mid, { opacity: 0.9 })));
+        scene.add(world.arcMesh);
+        world.packet = glow(add(scene, new THREE.SphereGeometry(0.07, 14, 12), glowMat(COL.acc)));
+
+        // DeepETA model: stacked slabs above the city
+        world.model = new THREE.Group();
+        for (let k = 0; k < 3; k++) {
+          const s = shadowed(add(world.model, new RoundedBoxGeometry(0.9, 0.09, 0.6, 3, 0.03), std(k === 1 ? 0xff6b1a : 0xffffff, { roughness: 0.4 }), 0, k * 0.2, 0));
+          if (k === 1) glow(s);
+        }
+        world.model.position.set(1.0, 1.7, -1.2);
+        scene.add(world.model);
+        world.mArc1 = new THREE.CatmullRomCurve3([V(-0.8, 0.4, 0.75), V(-0.2, 1.8, -0.2), V(0.8, 1.75, -1.2)]);
+        world.mArc2 = new THREE.CatmullRomCurve3([V(1.2, 1.75, -1.2), V(1.2, 1.5, 0.3), V(-0.6, 0.9, 0.8)]);
+        world.mArcMesh = [world.mArc1, world.mArc2].map((c) => { const m = glow(new THREE.Mesh(new THREE.TubeGeometry(c, 40, 0.012, 6), glowMat(COL.mid, { opacity: 0.8 }))); scene.add(m); return m; });
+        world.pk = [0, 1].map(() => glow(add(scene, new THREE.SphereGeometry(0.07, 14, 12), glowMat(COL.acc))));
+
+        // hexagon grid, rings up to 3
+        world.hexes = [];
+        for (let q = -3; q <= 3; q++) for (let r = -3; r <= 3; r++) {
+          const d = hexDist(q, r);
+          if (d > 3) continue;
+          const [x, z] = hexCenter(q, r);
+          const ring = glow(add(scene, new THREE.RingGeometry(HR * 0.95, HR * 0.99, 6).rotateX(-Math.PI / 2), glowMat(COL.mid, { opacity: 0 }), x, 0.02, z));
+          const fill = d <= 1 ? add(scene, new THREE.CircleGeometry(HR * 0.95, 6).rotateX(-Math.PI / 2), glowMat(COL.acc, { opacity: 0 }), x, 0.015, z) : null;
+          world.hexes.push({ q, r, d, ring, fill });
+        }
+
+        // cars, routes, ticks
+        world.cars = {};
+        CARS.forEach((c) => {
+          const car = makeCar(0x23272f);
+          car.g.position.set(c.x, c.y, c.z);
+          car.g.rotation.y = c.yaw;
+          scene.add(car.g);
+          world.cars[c.id] = { ...c, g: car.g, mat: car.mat, tint: colorTrack(c.col) };
+        });
+        world.route = { A: tubeFor(ROUTES.A, COL.ink), C: tubeFor(ROUTES.C, COL.acc), E: tubeFor(ROUTES.E, COL.mid) };
+        world.driveE = pathSampler(ROUTES.E);
+        world.dash = [];
+        for (let k = 0; k < 8; k++) world.dash.push(glow(add(scene, new THREE.BoxGeometry(0.11, 0.03, 0.04), glowMat(COL.ink), 0.12 + k * 0.17, 0.5, 0)));
+        world.ticks = [[-1.5, 1.5], [-1.5, 0.75], [-1.5, 0], [-0.75, 0], [0, 0]].map(([x, z]) => glow(add(scene, new THREE.SphereGeometry(0.075, 12, 10), glowMat(COL.ink), x, 0.16, z)));
+
+        // batch matching links
+        const drv = { C: [-1.5, 1.5], E: [0, -3] }, rid = { R1: [0, 0], R2: R2 };
+        world.links = [];
+        for (const d in drv) for (const r in rid) world.links.push({ d, r, m: linkTube(drv[d], rid[r], COL.mid, 0.02) });
+        world.fin = { C: linkTube(drv.C, rid.R2, COL.acc, 0.05), E: linkTube(drv.E, rid.R1, COL.acc, 0.05) };
+      }
+
+      // ---------------------------------------------------------------------------
+      // render(t) is a pure function of time
+      // ---------------------------------------------------------------------------
+      const ANCH = [];
+      const vA = new THREE.Vector3(), cT = new THREE.Color();
+      function placeAnchors(t) {
+        for (const a of ANCH) {
+          if (t < a.a || t > a.b) { a.el.style.opacity = "0"; continue; }
+          vA.copy(a.fn(t)).project(camera);
+          a.el.style.opacity = vA.z > 1 || vA.z < -1 ? "0" : "1";
+          a.el.style.transform = `translate(${(((vA.x + 1) / 2) * W).toFixed(1)}px, ${(((1 - vA.y) / 2) * H).toFixed(1)}px)`;
+        }
+      }
+      const overCam = (side, up, d = 9) =>
+        camera.position.clone().addScaledVector(V(0, 0, -1).applyQuaternion(camera.quaternion), d).addScaledVector(V(1, 0, 0).applyQuaternion(camera.quaternion), side).addScaledVector(V(0, 1, 0).applyQuaternion(camera.quaternion), up);
+      const carPos = (id, t) => {
+        const c = world.cars[id];
+        if (id === "E" && t > 113.9) { const s = world.driveE(seg(t, 113.95, 115.3, 0, 1, "power2.inOut")); return V(s.x, s.y, s.z); }
+        return V(c.x, c.y, c.z);
+      };
+      const carTop = (id, dy = 0.62) => (t) => carPos(id, t).add(V(0, dy, 0));
+
+      let drawn = -1;
+      function render(t) {
+        if (!built || t === drawn) return;
+        drawn = t;
+        camera.position.set(camP[0](t), camP[1](t), camP[2](t));
+        lookAt.set(camL[0](t), camL[1](t), camL[2](t));
+        camera.lookAt(lookAt);
+        camera.updateMatrixWorld();
+
+        // rider pin, pulse, second rider
+        const pinS = seg(t, 1.9, 2.18, 0, 1, "back.out(2)");
+        world.pin.scale.setScalar(Math.max(pinS, 0.001));
+        world.pin.visible = t > 1.85;
+        const ph = (t * 0.8) % 1;
+        world.pulse.visible = t > 1.9;
+        world.pulse.scale.setScalar(1 + ph * 4.5);
+        world.pulse.material.opacity = (1 - ph) * 0.7 * pinS;
+        const p2S = seg(t, 97.65, 97.93, 0, 1, "back.out(2)");
+        world.pin2.scale.setScalar(Math.max(p2S, 0.001));
+        world.pin2.visible = t > 97.6 && t < 116.3;
+
+        // phone, tower, packet
+        const phS = seg(t, 19.55, 19.83, 0, 1, "back.out(2)");
+        world.phone.scale.setScalar(Math.max(phS, 0.001));
+        world.phone.visible = t > 19.5 && t < 31.8;
+        world.phone.position.y = 0.95 + 0.04 * Math.sin(t * 2.2);
+        const twS = seg(t, 21.65, 21.93, 0, 1, "back.out(2)");
+        world.tower.scale.setScalar(Math.max(twS, 0.001));
+        world.tower.visible = t > 21.6 && t < 32.2;
+        world.arcMesh.visible = t > 21.0 && t < 23.9;
+        world.packet.visible = t > 21.1 && t < 23.7;
+        world.packet.position.copy(world.arc.getPoint(clamp((t - 21.1) / 2.4, 0, 0.999)));
+
+        // GPS accuracy ring: wide and wrong, then snapped to the pin
+        const rs = seg(t, 23.95, 24.4, 0, 1, "power2.out") * (1 - seg(t, 28.2, 30.4, 0, 0.88, "power2.inOut"));
+        world.acc.visible = world.accRing.visible = t > 23.9 && t < 31.9;
+        world.acc.scale.setScalar(Math.max(rs, 0.001));
+        world.accRing.scale.setScalar(Math.max(rs, 0.001));
+        const accO = seg(t, 23.95, 24.4, 0, 1) * (1 - seg(t, 30.4, 31.2, 0, 1));
+        world.acc.material.opacity = 0.1 * accO;
+        world.accRing.material.opacity = 0.9 * accO;
+        const snap = seg(t, 28.2, 30.4, 0, 1, "power2.inOut");
+        const wob = t < 28.2 ? 0.06 * Math.sin(t * 5.1) : 0;
+        world.gps.position.set((0.62 + wob) * (1 - snap), 0.12, (-0.5 + wob) * (1 - snap));
+        world.gps.visible = t > 24.2 && t < 30.9;
+
+        // hexagons
+        const fade = 1 - seg(t, 50.6, 51.2, 0, 0.85);
+        const focus = seg(t, 47.4, 48.0, 0, 1);
+        for (const h of world.hexes) {
+          const on = seg(t, 34.0 + h.d * 0.45, 34.28 + h.d * 0.45, 0, 1);
+          let o = on * (h.d <= 1 ? 0.95 : 0.7 * (1 - 0.75 * focus));
+          o *= t > 50.6 ? fade : 1;
+          if (t > 87.5) o *= 0.15;
+          h.ring.material.opacity = o;
+          h.ring.visible = o > 0.01;
+          cT.copy(COL.mid).lerp(COL.acc, h.d <= 1 ? focus : 0);
+          h.ring.material.color.copy(cT);
+          if (h.fill) { h.fill.material.opacity = 0.16 * focus * (t > 50.6 ? fade : 1) * (t > 87.5 ? 0 : 1); h.fill.visible = h.fill.material.opacity > 0.005; }
+        }
+
+        // cars
+        for (const id in world.cars) {
+          const c = world.cars[id];
+          const s = seg(t, c.t, c.t + 0.28, 0, 1, "back.out(2)");
+          c.g.scale.setScalar(Math.max(s, 0.001));
+          c.g.visible = t > c.t - 0.01;
+          c.tint(t, cT);
+          c.mat.color.copy(cT);
+          if (id === "E" && t > 113.9) {
+            const d = world.driveE(seg(t, 113.95, 115.3, 0, 1, "power2.inOut"));
+            c.g.position.set(d.x, d.y, d.z);
+            c.g.rotation.y = d.yaw;
+          }
+        }
+
+        // flyover, straight line, routes, ticks
+        world.barrier.visible = t > 53.0 && t < 62.0;
+        world.dash.forEach((d, k) => {
+          const v = seg(t, 57.3 + k * 0.05, 57.5 + k * 0.05, 0, 1);
+          d.visible = v > 0.01 && t < 61.5;
+          d.scale.setScalar(Math.max(v, 0.001));
+        });
+        setDraw(world.route.A, seg(t, 57.9, 60.6, 0, 1, "power1.inOut") * (t < 71 ? 1 : 1));
+        setDraw(world.route.C, seg(t, 63.2, 64.6, 0, 1, "power1.inOut"));
+        setDraw(world.route.E, seg(t, 63.6, 65.2, 0, 1, "power1.inOut"));
+        world.ticks.forEach((k, i) => {
+          const v = seg(t, 65.9 + i * 0.4, 66.18 + i * 0.4, 0, 1, "back.out(2)");
+          k.visible = v > 0.01;
+          k.scale.setScalar(Math.max(v, 0.001));
+        });
+
+        // DeepETA slabs and packets
+        const mS = seg(t, 76.95, 77.25, 0, 1, "back.out(2)");
+        world.model.scale.setScalar(Math.max(mS, 0.001));
+        world.model.visible = t > 76.9;
+        world.model.rotation.y = 0.25 * Math.sin(t * 0.7);
+        const up = seg(t, 79.6, 81.4, 0, 1), down = seg(t, 81.6, 83.3, 0, 1);
+        world.mArcMesh[0].visible = t > 79.5 && t < 84.0;
+        world.mArcMesh[1].visible = t > 81.5 && t < 84.0;
+        world.pk[0].visible = up > 0 && up < 1;
+        world.pk[1].visible = down > 0 && down < 1;
+        world.pk[0].position.copy(world.mArc1.getPoint(clamp(up, 0, 0.999)));
+        world.pk[1].position.copy(world.mArc2.getPoint(clamp(down, 0, 0.999)));
+
+        // batch matching links
+        const fin = seg(t, 107.9, 108.4, 0, 1);
+        for (const l of world.links) {
+          const on = seg(t, 100.4 + (l.d === "E" ? 0.3 : 0) + (l.r === "R2" ? 0.15 : 0), 101.0 + (l.d === "E" ? 0.3 : 0) + (l.r === "R2" ? 0.15 : 0), 0, 1);
+          let o = 0.7 * on * (1 - 0.85 * fin);
+          if (l.d === "C") { cT.copy(COL.mid).lerp(COL.acc, seg(t, 105.1, 105.5, 0, 1)); l.m.material.color.copy(cT); }
+          l.m.material.opacity = o;
+          l.m.visible = o > 0.01 && t < 112;
+        }
+        world.fin.C.material.opacity = fin;
+        world.fin.E.material.opacity = fin;
+        world.fin.C.visible = fin > 0.01 && t < 112;
+        world.fin.E.visible = fin > 0.01 && t < 112;
+
+        placeAnchors(t);
+
+        scene.background = null;
+        renderer.setClearColor(0x000000, 1);
+        scene.traverse(darken);
+        bloomComposer.render();
+        for (const [o, m] of saved) o.material = m;
+        saved.clear();
+        scene.background = bgColor;
+        finalComposer.render();
+      }
+
+      // ---------------------------------------------------------------------------
+      // HTML timeline. Reveal times lead the voice by about 0.08 s.
+      // ---------------------------------------------------------------------------
+      function buildTimeline() {
+        const tl = gsap.timeline({ paused: true });
+        const uiRoot = document.getElementById("ui"), ancRoot = document.getElementById("anchors");
+        const pop = (el, t, d = 0.28) => {
+          if (t <= 0) el.style.opacity = "1";
+          else tl.fromTo(el, { opacity: 0, y: 18, filter: "blur(8px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: d, ease: "power3.out", immediateRender: false }, t);
+        };
+        const hide = (el, t, d = 0.22) => tl.fromTo(el, { opacity: 1 }, { opacity: 0, duration: d, ease: "power2.in", immediateRender: false }, t);
+        function card({ k, t0, t1, cls = "" }) {
+          const el = document.createElement("div");
+          el.className = `card ${cls}`;
+          el.innerHTML = k ? `<div class="ov">${k}</div>` : "";
+          uiRoot.appendChild(el);
+          if (t0 <= 0) el.style.opacity = "1";
+          else tl.fromTo(el, { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.28, ease: "power3.out", immediateRender: false }, t0);
+          if (t1 < DUR) hide(el, t1);
+          return el;
+        }
+        function ttl(parent, words) {
+          const box = document.createElement("div");
+          box.className = "ttl";
+          words.forEach((line) => {
+            const row = document.createElement("div");
+            line.forEach(([w, t, c]) => {
+              const s = document.createElement("span");
+              s.className = `w ${c || ""}`;
+              s.textContent = w;
+              row.appendChild(s);
+              row.appendChild(document.createTextNode(" "));
+              pop(s, t);
+            });
+            box.appendChild(row);
+          });
+          parent.appendChild(box);
+          return box;
+        }
+        function sub(parent, text, t) {
+          const s = document.createElement("div");
+          s.className = "sub hid";
+          s.textContent = text;
+          pop(s, t);
+          parent.appendChild(s);
+        }
+        const chip = (text, cls, tIn, tOut, fn, pin = "") => {
+          const anc = document.createElement("div");
+          anc.className = "anc";
+          const p = document.createElement("div");
+          p.className = `pin ${pin}`;
+          const c = document.createElement("div");
+          c.className = `chip ${cls}`;
+          c.textContent = text;
+          p.appendChild(c);
+          anc.appendChild(p);
+          ancRoot.appendChild(anc);
+          ANCH.push({ el: anc, fn, a: tIn - 0.2, b: tOut + 0.3 });
+          pop(c, tIn);
+          if (tOut < DUR) hide(c, tOut);
+        };
+        const at = (x, y, z) => () => V(x, y, z);
+        let c;
+
+        // 1 hook (0-15.1)
+        c = card({ k: "Uber ride", t0: 0, t1: 10.45 });
+        ttl(c, [[["Nearest", 0.0], ["driver", 0.3, "ak"]], [["kaise", 0.62], ["aata", 0.92], ["hai?", 1.22]]]);
+        chip("Rider", "", 2.55, 8.9, at(0, 0.85, 0));
+        chip("Sabse paas?", "k", 5.0, 8.9, carTop("A"));
+        chip("Aadha sach", "a", 9.0, 10.4, at(0, 0.85, 0));
+        c = card({ k: "Asli jawab", t0: 10.85, t1: 15.2 });
+        ttl(c, [[["Paas", 10.9], ["≠", 11.9, "ak"], ["jaldi", 13.0]]]);
+        chip("Sabse paas", "k", 11.3, 15.2, carTop("A"));
+        chip("Sabse jaldi", "a", 13.0, 15.2, carTop("C"));
+        c = card({ k: "Backend", t0: 15.45, t1: 18.1 });
+        ttl(c, [[["Poora", 15.5], ["backend", 16.75, "ak"]]]);
+
+        // 2 location (18.4-31.6)
+        c = card({ k: "Step 1 · Location", t0: 18.25, t1: 23.55 });
+        ttl(c, [[["Phone", 19.6], ["→", 21.8, "ak"], ["servers", 22.25]]]);
+        chip("GPS signal", "", 20.95, 23.55, at(0, 1.55, 0));
+        chip("Uber servers", "a", 22.2, 23.55, at(2.6, 1.55, -3.0));
+        c = card({ k: "Step 1 · Location", t0: 23.78, t1: 31.7 });
+        ttl(c, [[["GPS", 23.8], ["50 m", 24.9, "ak"], ["galat", 25.8]], [["3D map", 28.55, "ak"], ["se theek", 29.4]]]);
+        chip("50 m+ galat", "k", 25.0, 27.9, at(0.75, 0.5, -0.7));
+        chip("3D map match", "a", 28.5, 31.7, at(0, 1.1, 0));
+
+        // 3 hex grid (32.0-50.4)
+        c = card({ k: "Step 2 · Hex grid", t0: 31.95, t1: 50.5 });
+        ttl(c, [[["Shehar", 32.0], ["→", 33.7, "ak"], ["hexagons", 34.75]]]);
+        sub(c, "H3 · Uber ka open-source grid", 36.4);
+        sub(c, "Pricing + dispatch", 39.7);
+        chip("H3", "a", 36.95, 39.6, at(1.3, 0.2, -1.9));
+        chip("Open source", "", 38.1, 39.7, at(-1.6, 0.2, -2.1));
+        chip("Pricing", "", 40.7, 43.8, at(-2.6, 0.2, 0.9));
+        chip("Dispatch", "", 41.5, 43.8, at(2.7, 0.2, 1.2));
+        chip("Sirf aas-paas ke hexagons", "a", 47.6, 50.5, at(-0.4, 0.2, -2.3));
+
+        // 4 real distance (50.8-69.8)
+        c = card({ k: "Step 3 · Distance", t0: 50.8, t1: 52.9 });
+        ttl(c, [[["Asli", 51.8], ["doori", 52.25, "ak"]]]);
+        c = card({ k: "Flyover", t0: 53.3, t1: 61.3 });
+        ttl(c, [[["Paas", 53.8], ["hai", 54.4]], [["par", 56.0], ["ramp nahi", 56.2, "ak"]]]);
+        chip("Seedhi line: paas", "", 57.3, 61.3, at(0.75, 0.6, 0));
+        chip("Yahan ramp nahi", "k", 55.95, 61.3, at(0.9, 0.85, 0));
+        chip("10 min (example)", "a", 59.9, 61.3, carTop("A"));
+        c = card({ k: "Routing engine", t0: 61.45, t1: 69.8 });
+        ttl(c, [[["Sadak", 63.7], ["+", 64.5, "ak"], ["traffic", 64.95]], [["= ETA", 68.35, "ak"]]]);
+        sub(c, "Har tukde ka time jodo", 65.8);
+        chip("Segment 1", "", 66.0, 66.9, at(-1.5, 0.7, 1.0));
+        chip("ETA = sum", "a", 68.3, 69.8, at(-0.8, 0.7, 0.75));
+
+        // 5 AI (70.9-86.8)
+        c = card({ k: "Step 4 · AI", t0: 70.8, t1: 75.8 });
+        ttl(c, [[["Andaza", 72.3], ["≠", 73.1, "ak"], ["asli", 73.8], ["time", 74.0]]]);
+        sub(c, "Example numbers", 72.6);
+        chip("Engine: 3 min", "", 72.4, 78.4, carTop("C"));
+        chip("Asli: 4 min", "k", 74.2, 78.4, carTop("C", 1.05));
+        chip("Engine: 4 min", "", 72.9, 78.4, carTop("E"));
+        chip("Engine: 10 min", "", 73.2, 78.4, carTop("A"));
+        c = card({ k: "Uber ka model", t0: 76.1, t1: 78.5, cls: "y" });
+        const lg = document.createElement("img");
+        lg.src = "uber.svg";
+        lg.className = "logo";
+        lg.alt = "Uber";
+        const tt = ttl(c, [[["DeepETA", 77.2, "ak"]]]);
+        tt.firstChild.insertBefore(lg, tt.firstChild.firstChild);
+        pop(lg, 76.15);
+        c = card({ k: "DeepETA", t0: 78.95, t1: 86.85 });
+        ttl(c, [[["Fark", 82.0], ["seekhta", 82.35, "ak"], ["hai", 82.9]]]);
+        sub(c, "Transformer-style model", 79.15);
+        sub(c, "Jawab milliseconds mein", 84.3);
+        chip("DeepETA model", "a", 79.15, 86.85, at(1.0, 2.5, -1.2));
+        chip("DeepETA: 4 min", "a", 83.3, 86.85, carTop("C"));
+        chip("DeepETA: 5 min", "", 83.5, 86.85, carTop("E"));
+        chip("DeepETA: 12 min", "", 83.7, 86.85, carTop("A"));
+
+        // 6 matching (87.2-109.3)
+        c = card({ k: "Step 5 · Matching", t0: 87.2, t1: 95.9 });
+        ttl(c, [[["Closest", 89.1], ["≠", 91.6, "ak"], ["quickest", 93.0]]]);
+        chip("Pehle: sabse paas kaun?", "k", 89.2, 92.0, carTop("A"));
+        chip("Paas ≠ jaldi", "a", 93.05, 95.9, carTop("A"));
+        c = card({ k: "Batch", t0: 96.0, t1: 103.3 });
+        ttl(c, [[["Ek", 96.1], ["batch", 98.7, "ak"], ["mein", 99.05]]]);
+        sub(c, "Sabka average wait kam", 100.9);
+        chip("Rider 1", "", 97.95, 112.0, at(0, 0.85, 0));
+        chip("Rider 2", "", 98.05, 112.0, at(R2[0], 0.85, R2[1]));
+        c = card({ k: "Do riders", t0: 103.45, t1: 109.3 });
+        ttl(c, [[["Ek", 104.5], ["driver", 104.65], ["do", 105.05], ["riders", 105.2, "ak"]]]);
+        chip("Ek driver, do riders", "a", 105.1, 107.8, carTop("C"));
+        chip("Poori tasveer", "k", 107.7, 111.5, at(-1.6, 0.9, 0.4));
+
+        // 7 request (109.7-115.2)
+        c = card({ k: "Last step", t0: 109.65, t1: 115.5 });
+        ttl(c, [[["Driver", 110.6], ["app", 111.3], ["par", 111.7], ["request", 111.8, "ak"]]]);
+        chip("Request", "", 111.85, 113.7, carTop("E"));
+        chip("Driver: haan", "a", 113.7, 115.9, carTop("E"));
+
+        // 8 recap (115.9-121.95)
+        ["pp0", "pp1", "pp2", "pp3", "pp4"].forEach((id, i) => {
+          const el = document.getElementById(id);
+          pop(el, [116.45, 117.35, 118.4, 119.8, 121.35][i]);
+          hide(el, 122.15);
+        });
+
+        // 9 caveat (122.6-127.35)
+        c = card({ k: "Dhyaan rakhna", t0: 122.45, t1: 127.45 });
+        ttl(c, [[["Poora", 122.6], ["algorithm", 123.4], ["public", 123.9, "ak"], ["nahi", 124.3]]]);
+        sub(c, "Sirf wahi hissa jo Uber ne bataya", 125.1);
+
+        // 10 question and follow (128.0-137)
+        c = card({ k: "Aapki baari", t0: 127.9, t1: 133.75 });
+        ttl(c, [[["Paas", 128.8], ["wala", 129.4], ["ya", 130.95], ["jaldi", 131.5, "ak"], ["wala?", 131.75]]]);
+        chip("Comment karo", "a big", 132.65, 133.75, () => overCam(0, -0.7), "c");
+        chip("+ Follow · Unseen Engine", "k big", 133.7, DUR, () => overCam(0, -0.7), "c");
+
+        // driver: the runtime sweeps the whole timeline on load with callbacks muted, so playback
+        // draws from onUpdate and capture seeks draw from the hf-seek listener, never per sweep step.
+        const clock = { t: 0 };
+        tl.to(clock, { t: DUR, duration: DUR, ease: "none", onUpdate: () => render(clock.t) }, 0);
+        return tl;
+      }
+
+      async function build() {
+        try {
+          await Promise.all(['500 40px "Space Grotesk"', '700 40px "Space Grotesk"', '500 40px "JetBrains Mono"', '700 40px "JetBrains Mono"'].map((f) => document.fonts.load(f, "→≠Aa")));
+        } catch (e) {
+          /* fallback fonts */
+        }
+        buildWorld();
+        built = true;
+        const tl = buildTimeline();
+        render(0);
+        window.__timelines = window.__timelines || {};
+        window.__timelines["main"] = tl;
+        if (window.__hfForceTimelineRebind) window.__hfForceTimelineRebind();
+      }
+      window.addEventListener("hf-seek", (e) => render(e.detail.time));
+      window.__hf = window.__hf || {};
+      window.__hf.buildReady = window.__hf.buildReady || {};
+      window.__hf.buildReady["uber"] = build();
+    </script>
+  </body>
+</html>
