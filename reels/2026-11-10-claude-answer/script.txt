@@ -1,0 +1,14 @@
+Claude जवाब कहीं से copy नहीं करता। ज़्यादातर लोग इसके बारे में गलत सोचते हैं।
+आपका सवाल Anthropic के servers तक जाता है।
+वहाँ वो छोटे टुकड़ों में टूटता है जिन्हें tokens कहते हैं।
+हर token एक number बन जाता है।
+फिर model अरबों numbers से बस एक चीज़ तय करता है।
+अगला token क्या होगा।
+एक token लिखा फिर पिछले सारे tokens देखे फिर अगला।
+इसीलिए जवाब screen पर typing जैसा आता है।
+Training में Claude ने बहुत सारा text पढ़कर patterns सीखे।
+फिर Anthropic ने उसे principles की एक list दी।
+इसे Constitutional AI कहते हैं।
+पर याद रखना वो कभी कभी गलत भी हो सकता है।
+आप Claude से सबसे पहले क्या पूछोगे?
+Follow Unseen Engine for more.
