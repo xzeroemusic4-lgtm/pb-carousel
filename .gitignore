@@ -8,3 +8,4 @@ reels/*/renders/
 *.mp4
 !media/*.mp4
 reels/*/.hyperframes/
+__pycache__/
