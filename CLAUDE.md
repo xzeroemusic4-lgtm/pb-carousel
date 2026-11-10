@@ -9,10 +9,11 @@ Two runs a day. The 7:00 AM India run publishes at 8:00 AM, and the 5:00 PM Indi
 ## Stop rules (check first)
 
 1. Read `state/posts.json`. If the month differs from the current India month, reset `posts_used` to 0.
-2. Each reel uses 2 posts (Instagram and YouTube). If `posts_used + 2 > limit`, make nothing. Send a push notification: "Metricool's 20 post limit is reached for this month. Tell me which option to use next." Then stop.
-3. If Metricool itself reports a limit error, stop and send the same notification.
-4. Any failed step: retry that step once. If it fails again, stop, post nothing, and send a push notification naming the step and the error. Never post a reel that failed a check.
-5. If you are running behind, simplify the visuals (fewer scenes, simpler props) rather than skip a check. The slot should not slip.
+2. If today's slot (for example `2026-11-11T18:00`) is listed in `booked_slots` in `state/posts.json`, a reel is already scheduled for it: make nothing, send no notification, and stop. Remove slots older than today from that list.
+3. Each reel uses 2 posts (Instagram and YouTube). If `posts_used + 2 > limit`, make nothing. Send a push notification: "Metricool's 20 post limit is reached for this month. Tell me which option to use next." Then stop.
+4. If Metricool itself reports a limit error (also check `getScheduledPosts` for today: a post whose status says "account limit" counts), stop and send the same notification.
+5. Any failed step: retry that step once. If it fails again, stop, post nothing, and send a push notification naming the step and the error. Never post a reel that failed a check.
+6. If you are running behind, simplify the visuals (fewer scenes, simpler props) rather than skip a check. The slot should not slip.
 
 ## Daily steps
 
