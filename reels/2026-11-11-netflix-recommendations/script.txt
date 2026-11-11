@@ -1,0 +1,37 @@
+आपने Netflix का home screen हज़ारों बार देखा है पर कभी ध्यान नहीं दिया।
+आपकी screen और आपके दोस्त की screen एक जैसी नहीं होती।
+Rows अलग होती हैं और कई बार एक ही film का poster भी अलग होता है।
+ये सब एक AI system तय करता है। कोई इंसान ये list नहीं बनाता।
+Netflix के engineers के 2015 के paper के हिसाब से लगभग 80 percent viewing इन्हीं suggestions से आती थी।
+चलो देखते हैं ये system अंदर से कैसे काम करता है।
+एक example लेते हैं।
+मान लो रवि रात को 11 बजे phone पर एक Korean thriller देखता है।
+और दो episode के बाद बीच में छोड़ देता है।
+Netflix की app ये हर छोटी बात backend servers को भेजती है।
+क्या देखा कितनी देर देखा किस समय और किस device पर देखा।
+आपने किस चीज़ पर click किया और किसे skip किया ये भी।
+ये सारा data Netflix के cloud servers पर इकट्ठा होता है।
+अब पहला step है similar लोग ढूंढना।
+System देखता है कि जिन लोगों की पसंद रवि जैसी है उन्होंने आगे क्या देखा।
+दूसरा step है हर film को समझना।
+हर title के साथ genre actors language और साल जैसी जानकारी जुड़ी होती है।
+तीसरा step है prediction।
+Model हर title के लिए अंदाज़ा लगाता है कि रवि इसे play करेगा या नहीं।
+2025 में Netflix ने बताया कि वो एक बड़ा foundation model बना रहे हैं।
+ये model ChatGPT जैसे transformer पर बना है।
+ChatGPT अगला word predict करता है।
+और ये model आपकी history देखकर अगला title predict करता है।
+चौथा step है home page सजाना।
+सबसे ऊपर कौनसी row आएगी और row में कौनसा title पहले ये भी model तय करता है।
+और अब सबसे interesting हिस्सा।
+एक film के लिए Netflix के पास कई दर्जन poster हो सकते हैं।
+अगर रवि ज़्यादा romance देखता है तो उसे romantic scene वाला poster दिख सकता है।
+अगर comedy देखता है तो उसी film का funny scene वाला poster।
+इसके लिए Netflix ने contextual bandit नाम की technique इस्तेमाल की है जो हर click से सीखती रहती है।
+पर ये system perfect नहीं है।
+नई film का कोई data नहीं होता तो model को शुरुआत में अंदाज़ा लगाना पड़ता है।
+और अगर आप एक ही तरह की चीज़ देखते रहें तो आपको वैसी ही चीज़ें दिखती रहती हैं।
+तो अगली बार कोई poster आपको खींचे तो याद रखना।
+वो शायद सिर्फ आपके लिए चुना गया था।
+आपकी Netflix screen पर अभी सबसे ऊपर क्या दिख रहा है?
+Follow Unseen Engine for more.
